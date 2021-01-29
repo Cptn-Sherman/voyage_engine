@@ -31,6 +31,7 @@ public class TextureData implements IData {
 	Texture texture;
     ByteBuffer buffer;
     int width, height;
+    int bytesPerPixel;
 
     public TextureData(Texture texture, ByteBuffer image, int width, int height) {
         this.texture = texture;
@@ -39,6 +40,17 @@ public class TextureData implements IData {
         this.height = height;
         texture.setWidth(width);
         texture.setHeight(height);
+        this.bytesPerPixel = 4;
+    }
+
+    public TextureData(Texture texture, ByteBuffer image, int width, int height, int bpp) {
+        this.texture = texture;
+        this.buffer = image;
+        this.width = width;
+        this.height = height;
+        texture.setWidth(width);
+        texture.setHeight(height);
+        this.bytesPerPixel = bpp;
     }
 
     @Override
@@ -63,8 +75,30 @@ public class TextureData implements IData {
         if (texture.isMipmapped()) {
             glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL11.GL_TRUE);
         }
+   
+        // sets the internal format based on the number of bytes per pixel provided.
+        // this allows monochrome (black & white) images to use only 1 byte or textures with no alpha can use 3 bytes.
+        int internal_format, format;
+        switch(bytesPerPixel) {
+            case 4:
+            internal_format = GL_RGBA8;
+            format = GL_RGBA;
+            break;
+            case 3:
+            internal_format = GL11.GL_RGB8;
+            format = GL11.GL_RGB;
+            break;
+            case 1:
+            internal_format = GL11.GL_LUMINANCE8;
+            format = GL11.GL_LUMINANCE;
+            break;
+            default:
+            internal_format = GL11.GL_RGB8;
+            format = GL11.GL_RGB;
+            break;
+        }    
         // store image byte buffer on the gpu.
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, buffer);
         if (texture.isMipmapped()) {
             GL30.glGenerateMipmap(GL_TEXTURE_2D);
         }
