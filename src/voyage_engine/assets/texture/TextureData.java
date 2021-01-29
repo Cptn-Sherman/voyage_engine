@@ -55,6 +55,17 @@ public class TextureData implements IData {
 
     @Override
     public void process() {
+        if (texture.getTextureID() != 0) {
+            // usually we do not wanna do this, call remove directly.
+            // this should be reserved for the asset manager however, in this
+            // instance setting new data it should be fine.
+            texture.remove();
+            // may not need to set these values but just to be safe.
+            texture.setReady(false);
+            texture.setTextureID(0);
+        }
+ 
+
         texture.setTextureID(glGenTextures());
         glBindTexture(GL_TEXTURE_2D, texture.getTextureID());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
