@@ -35,7 +35,7 @@ public class Camera {
         right = new Vec3();
         up = new Vec3();
 
-        createOrthoMatrix(-1.0f, 1.0f, -1.0f, 1.0f, -1f, 100f);
+        createOrthoMatrix(-0.5f, 0.5f, -0.5f, 0.5f, -1f, 100f);
         createProjectionMatrix(1000.0f, 0.1f, 75.0f, Application.getSettings().getWidth(), Application.getSettings().getHeight());
     }
 	
