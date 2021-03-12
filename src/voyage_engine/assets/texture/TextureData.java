@@ -28,21 +28,11 @@ import spool.IData;
 
 public class TextureData implements IData {
 
-	Texture texture;
-    ByteBuffer buffer;
-    int width, height;
-    int bytesPerPixel;
-
-    public TextureData(Texture texture, ByteBuffer image, int width, int height) {
-        this.texture = texture;
-        this.buffer = image;
-        this.width = width;
-        this.height = height;
-        texture.setWidth(width);
-        texture.setHeight(height);
-        this.bytesPerPixel = 4;
-    }
-
+	private Texture texture;
+    private ByteBuffer buffer;
+    private int width, height;
+    private int bytesPerPixel;
+    
     public TextureData(Texture texture, ByteBuffer image, int width, int height, int bpp) {
         this.texture = texture;
         this.buffer = image;
@@ -51,6 +41,10 @@ public class TextureData implements IData {
         texture.setWidth(width);
         texture.setHeight(height);
         this.bytesPerPixel = bpp;
+    }
+
+    public TextureData(Texture texture, ByteBuffer image, int width, int height) {
+        this(texture, image, width, height, 4);
     }
 
     @Override
@@ -64,7 +58,6 @@ public class TextureData implements IData {
             texture.setReady(false);
             texture.setTextureID(0);
         }
- 
 
         texture.setTextureID(glGenTextures());
         glBindTexture(GL_TEXTURE_2D, texture.getTextureID());
