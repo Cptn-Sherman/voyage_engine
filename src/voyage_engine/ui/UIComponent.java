@@ -1,50 +1,62 @@
 package voyage_engine.ui;
 
-public abstract class UIComponent {
+import voyage_engine.util.Vec2;
 
-	private int pos_x, pos_y;
-	private int width, height;
+public abstract class UIComponent {
+	protected Vec2 position, visiblePos;
+	protected Vec2 dimensions;
+	protected UIAnchor anchor;
 	
 	private boolean visible = true;
 	
-	
 	UIComponent() {
-		this(0, 0, 10, 10);
+		this(0, 0, 10, 10, UIAnchor.BOTTOM_LEFT);
 	}
 	
-	UIComponent (int x, int y, int w, int h) {
+	UIComponent (int x, int y, int w, int h, UIAnchor anchor) {
+		position = new Vec2();
+		visiblePos = new Vec2();
+		dimensions = new Vec2();
+		
+		setAnchor(anchor);
 		setPosition(x, y);
 		setDimensions(w, h);
+		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
 	}
 	
 	public void setVisibility(boolean vis) {
 		visible = vis;
 	}
 	
-	public void setPosition(int x, int y) {
-		pos_x = x;
-		pos_y = y;
+	public void setPosition(float x, float y) {
+		position.set(x, y);
+		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
 	}
 	
-	public void setDimensions(int w, int h) {
-		width = w;
-		height = h;
+	public void setDimensions(float length, float height) {
+		dimensions.set(length, height);
+		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
 	}
 	
-	public int getPosX() {
-		return pos_x;
+	public void setAnchor(UIAnchor anchor) {
+		this.anchor = anchor;
+		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
 	}
 	
-	public int getPosY() {
-		return pos_y;
+	public Vec2 getPosition() {
+		return position;
 	}
 	
-	public int getWidth() {
-		return width;
+	public Vec2 getVisiblePosition() {
+		return visiblePos;
 	}
 	
-	public int getHeight() {
-		return height;
+	public Vec2 getDimensions() {
+		return dimensions;
+	}
+
+	public UIAnchor getAnchor() {
+		return anchor;
 	}
 	
 	public boolean getVisibility() {

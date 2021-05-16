@@ -47,6 +47,7 @@ import voyage_engine.assets.mesh.Mesh;
 import voyage_engine.assets.mesh.MeshData;
 import voyage_engine.assets.texture.Texture;
 import voyage_engine.util.IOUtil;
+import voyage_engine.util.Vec2;
 
 public class Font extends Asset implements IInstantLoad, IGPUAsset {
 	private static final int BITMAP_W = 2048;
@@ -140,9 +141,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 				IntBuffer descent = memAllocInt(1);
 				IntBuffer line_gap = memAllocInt(1);
 				stbtt_GetFontVMetrics(font_info, ascent, descent, line_gap);
-				font_height = (ascent.get(0) - descent.get(0)) / Application.getSettings().getHeight();
-				line_height = (ascent.get(0) - descent.get(0) + line_gap.get(0))
-						/ (float) Application.getSettings().getHeight();
+				line_height = (((ascent.get(0) - descent.get(0) + line_gap.get(0)))) * (scale);
 			}
 
 		} catch (IOException e) {
@@ -152,13 +151,13 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		System.out.println("[content]: loaded font: " + filename);
 	}
 
-	public float generateMesh(Mesh mesh, String text, int size) {
+	public Vec2 generateMesh(Mesh mesh, String text, int size) {
 		xb.put(0, 0f);
 		yb.put(0, 0f);
 		chardata.position(0);
 		// generate the mesh data class.
 		// 8 floats per character, 4 sets of 2 positions.
-		// 8 floats per character, 4 sets of 2 texture cordinates.
+		// 8 floats per character, 4 sets of 2 texture coordinates.
 		// 6 integers per character, 2 sets of 3 to build triangles in counter clockwise
 		// order.
 		MeshData data = new MeshData(mesh);
@@ -166,16 +165,22 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		data.positions = new float[text.length() * 8];
 		data.uv = new float[text.length() * 8];
 		data.indices = new int[text.length() * 6];
-		// set up counter variables to find array postion.
+		// set up counter variables to find array position.
 		int pos = 0, uv = 0, index = 0, last_index = 0;
 		// calculate the actual size for the characters.
 		float font_scale = (float) 2f * (size / BAKED_FONT_PIXEL_SIZE);
 		//
-		float total_line_width = 0f;
+		float text_width = 0.0f, text_height = 0.0f;
 		// loop and add each character to the mesh data.
 		for (int i = 0; i < text.length(); i++) {
-			// todo: need to handle special characters like new line, tabs, etc...
-
+			// TODO: need to handle special characters like new line, tabs, etc...
+			if(text.charAt(i) == '\n') {
+				xb.put(0, 0f);
+				yb.put(0, yb.get(0) + line_height);
+				text_height += line_height;
+				continue;
+			}
+			
 			stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, chardataIndices.get((int) text.charAt(i)), xb, yb, quad,
 					true);
 			// vertex 0
@@ -217,11 +222,18 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			last_index += 4;
 
 			// add up the total line_width
-			total_line_width = font_scale * (quad.x1() / (float) Application.getSettings().getWidth());
+			if(font_scale * quad.x1() > text_width) {				
+				text_width = font_scale * quad.x1();
+			}
+		}
+		
+		if(text_height == 0.0f) {
+			text_height = getHeight(size);
 		}
 		// go ahead and process the mesh data now.
 		data.process();
-		return total_line_width;
+		// todo: try to avoid making a instance of vec2 here.
+		return new Vec2(text_width, text_height);
 	}
 
 	@Override
@@ -247,16 +259,14 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		this.texture = texture;
 	}
 
-	public float getFontHeight(float font_size) {
-		return ((font_size * Application.getSettings().getHeight()) / BAKED_FONT_PIXEL_SIZE) * (scale);
-	}
-
-	public float getLineHeight(int font_size) {
-		return ((font_size) / BAKED_FONT_PIXEL_SIZE) * (line_height * scale);
+	public float getHeight(float font_size) {
+		return ((2.0f * font_size * Application.getSettings().getHeight()) / BAKED_FONT_PIXEL_SIZE) * (scale);
 	}
 
 	public enum FontStyle {
-		Normal, Bold, Italic
+		NORMAL, 
+		BOLD, 
+		ITALIC
 	}
 
 	@Override
