@@ -48,12 +48,8 @@ public class AssetManager {
 			}
 		}
 		
-		// get the supported thread pool count.
-		int threadCount = Runtime.getRuntime().availableProcessors() - 1;
-		// set the minimum thread count just in case.
-		if (threadCount < 1)
-			threadCount = 1;
-		Spool.init(threadCount);
+		// Start spool and use the default initializer to auto detect thread count.
+		Spool.init();
 	}
 
 	// check the data queue for assets that need to be uploaded to the gpu.

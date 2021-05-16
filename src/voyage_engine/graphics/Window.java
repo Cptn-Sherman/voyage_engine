@@ -188,6 +188,16 @@ public class Window {
 		return window_address;
 	}
 
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+
+
 	// closes and disposes of window resources, clears callbacks, terminates GLFW.
 	public void close() {
 		// free the window callbacks and destroy the window

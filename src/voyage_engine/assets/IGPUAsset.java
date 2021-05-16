@@ -4,4 +4,5 @@ package voyage_engine.assets;
 public interface IGPUAsset {
 
 	public void remove();
+
 }

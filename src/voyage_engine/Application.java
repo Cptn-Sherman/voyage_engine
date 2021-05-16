@@ -152,4 +152,12 @@ public class Application {
 	public static int getTPS() {
 		return tps;
 	}
+
+	public static int getWidth() {
+		return window.getWidth();
+	}
+
+	public static int getHeight() {
+		return window.getHeight();
+	}
 }
