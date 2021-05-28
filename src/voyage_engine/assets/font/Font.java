@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+// stbtt_GetFontVMetrics
 import static org.lwjgl.stb.STBTruetype.stbtt_GetFontVMetrics;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetPackedQuad;
 import static org.lwjgl.stb.STBTruetype.stbtt_InitFont;
@@ -22,14 +23,12 @@ import static org.lwjgl.stb.STBTruetype.stbtt_ScaleForPixelHeight;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAllocFloat;
-import static org.lwjgl.system.MemoryUtil.memAllocInt;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
@@ -50,59 +49,49 @@ import voyage_engine.util.IOUtil;
 import voyage_engine.util.Vec2;
 
 public class Font extends Asset implements IInstantLoad, IGPUAsset {
-	private static final int BITMAP_W = 2048;
-	private static final int BITMAP_H = 2048;
+	private static final int BITMAP_W = 2048, BITMAP_H = 2048;
 	private static final float BAKED_FONT_PIXEL_SIZE = 128.0f;
-
+	// inputs
 	String filename;
 	FontStyle style;
 	Texture texture;
 	boolean filter;
 	int oversampling = 1;
+	
+	private STBTTFontinfo font_info;
+	private STBTTPackedchar.Buffer chardata;
+	
+	private final STBTTAlignedQuad quad;
+	private final FloatBuffer xb;
+	private final FloatBuffer yb;
 
-	final STBTTAlignedQuad quad;
-	final FloatBuffer xb;
-	final FloatBuffer yb;
-
-	float font_height;
-	float line_height;
-	float scale;
-
-	STBTTFontinfo font_info = STBTTFontinfo.malloc();
-	STBTTPackedchar.Buffer chardata;
-	Map<Integer, Integer> chardataIndices;
+	private float ascent, descent, lineGap, baked_line_height, baked_line_spacing, baked_font_scale_factor;
 
 	public Font(String filename, int oversampling, boolean filter) {
 		super(true);
-		this.filename = filename;
+		setFilename(filename);
 		this.filter = filter;
 		this.oversampling = oversampling;
 		texture = new Texture();
-		
+
 		// create constants for getting character information
 		// used to build the text meshes.
+		chardata = STBTTPackedchar.malloc(96);
+		font_info = STBTTFontinfo.malloc();
 		quad = STBTTAlignedQuad.malloc();
 		xb = memAllocFloat(1);
 		yb = memAllocFloat(1);
 	}
-
-	@Override
-	public boolean isReady() {
-		return isReady;
-	}
-
+	
 	public void load() {
 		if (!isFilenameValid(filename)) {
-			System.out.println("[content]: Error font could not be loaded. \n\tNo filename provided or filename did not end with \".ttf\" or \".otf\".");
+			System.out.println(
+					"[content]: Error font could not be loaded. \n\t" 
+					+ "No filename provided or filename did not end with \".ttf\" or \".otf\".");
 			return;
 		}
-		texture.setTextureID(glGenTextures());
-		chardata = STBTTPackedchar.malloc(96);
-		chardataIndices = new HashMap<Integer, Integer>();
 
-		for (int i = 0; i < chardata.remaining(); i++) {
-			chardataIndices.put(i + 32, i);
-		}
+		texture.setTextureID(glGenTextures());
 
 		try (STBTTPackContext pc = STBTTPackContext.malloc()) {
 			// byteBuffer containing the ttf file content.
@@ -116,8 +105,8 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			// set the oversampling values to allow smaller resolutions to render more
 			// crisp.
 			stbtt_PackSetOversampling(pc, oversampling, oversampling);
+			baked_font_scale_factor = stbtt_ScaleForPixelHeight(font_info, BAKED_FONT_PIXEL_SIZE);
 			// write the characters on the bytebuffer.
-			scale = stbtt_ScaleForPixelHeight(font_info, BAKED_FONT_PIXEL_SIZE);
 			stbtt_PackFontRange(pc, ttf, 0, BAKED_FONT_PIXEL_SIZE, 32, chardata);
 			// end the writing on the buffer.
 			stbtt_PackEnd(pc);
@@ -135,13 +124,20 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			glBindTexture(GL_TEXTURE_2D, 0);
 			System.out.println("[content]: generated font texture for: " + filename);
 
-			// find the fonts vertical height used for alignment and positioning
 			try (MemoryStack stack = stackPush()) {
-				IntBuffer ascent = memAllocInt(1);
-				IntBuffer descent = memAllocInt(1);
-				IntBuffer line_gap = memAllocInt(1);
-				stbtt_GetFontVMetrics(font_info, ascent, descent, line_gap);
-				line_height = (((ascent.get(0) - descent.get(0) + line_gap.get(0)))) * (scale);
+				IntBuffer bufAscent = stack.mallocInt(1);
+				IntBuffer bufDescent = stack.mallocInt(1);
+				IntBuffer bufLineGap = stack.mallocInt(1);
+				stbtt_GetFontVMetrics(font_info, bufAscent, bufDescent, bufLineGap);
+				ascent = bufAscent.get(0);
+				descent = bufDescent.get(0);
+				lineGap = bufLineGap.get(0);
+				baked_line_height = (ascent - descent + lineGap) * baked_font_scale_factor;
+				System.out.println("ascent = " + ascent);
+				System.out.println("descent = " + descent);
+				System.out.println("lineGap = " + lineGap);
+				System.out.println("font_scale_factor = " + baked_font_scale_factor);
+				System.out.println("baked line height = " + baked_line_height);
 			}
 
 		} catch (IOException e) {
@@ -151,10 +147,11 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		System.out.println("[content]: loaded font: " + filename);
 	}
 
-	public Vec2 generateMesh(Mesh mesh, String text, int size) {
+	public void generateMesh(Mesh mesh, String text, int desired_size, Vec2 outDimensions) {
+		// reset the position in the buffers
 		xb.put(0, 0f);
 		yb.put(0, 0f);
-		chardata.position(0);
+		// chardata.position(0); // idk what this does but removing makes not affect...
 		// generate the mesh data class.
 		// 8 floats per character, 4 sets of 2 positions.
 		// 8 floats per character, 4 sets of 2 texture coordinates.
@@ -168,49 +165,66 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		// set up counter variables to find array position.
 		int pos = 0, uv = 0, index = 0, last_index = 0;
 		// calculate the actual size for the characters.
-		float font_scale = (float) 2f * (size / BAKED_FONT_PIXEL_SIZE);
-		//
-		float text_width = 0.0f, text_height = 0.0f;
+		float scale_factor = (float) desired_size / (float) BAKED_FONT_PIXEL_SIZE;
+		float text_height = 0f, text_width = 0f, out_text_height = 0f; 
+		float x0, x1, y0, y1, u0, v0, u1, v1, offset;
+
 		// loop and add each character to the mesh data.
 		for (int i = 0; i < text.length(); i++) {
-			// TODO: need to handle special characters like new line, tabs, etc...
-			if(text.charAt(i) == '\n') {
+
+			if(text.charAt(i) == '\n') { 
+				// the baked line height is used because the yb assumes Baked size spacing the scaling is done later.
+				text_height += baked_line_height;
 				xb.put(0, 0f);
-				yb.put(0, yb.get(0) + line_height);
-				text_height += line_height;
+				yb.put(0, text_height); // advance the y position by some amount
+				continue;
+			} else if (text.charAt(i) == ' ') {
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
+				continue;
+			} else if (text.charAt(i) == '\t') {
+				// !this is kinda hacky but it essientally adds 5 spaces to the mesh; correctly spacing the x and y buffer value.
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
+				stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, ' ' - 32, xb, yb, quad, false);
 				continue;
 			}
+
+			stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, text.charAt(i) - 32, xb, yb, quad, false);
 			
-			stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, chardataIndices.get((int) text.charAt(i)), xb, yb, quad,
-					true);
+			x0 = quad.x0() * scale_factor / (float) Application.getWidth();
+			x1 = quad.x1() * scale_factor / (float) Application.getWidth();
+			y0 = quad.y0() * scale_factor / (float) Application.getHeight();
+			y1 = quad.y1() * scale_factor / (float) Application.getHeight();
+			offset = BAKED_FONT_PIXEL_SIZE * scale_factor / (float) Application.getHeight();
+			System.out.println("offset was: " + offset);
+			// read texture coordinates from packed quad
+			u0 = quad.s0();
+			v0 = quad.t0();
+			u1 = quad.s1();
+			v1 = quad.t1();
+
 			// vertex 0
-			data.positions[pos++] = font_scale
-					* (quad.x0() / (float) Application.getSettings().getWidth());
-			data.positions[pos++] = -font_scale
-					* (quad.y0() / (float) Application.getSettings().getHeight());
-			data.uv[uv++] = quad.s0();
-			data.uv[uv++] = quad.t0();
+			data.positions[pos++] = x0;
+			data.positions[pos++] = -y0 - offset;
+			data.uv[uv++] = u0;
+			data.uv[uv++] = v0;
 			// vertex 1
-			data.positions[pos++] = font_scale
-					* (quad.x1() / (float) Application.getSettings().getWidth());
-			data.positions[pos++] = -font_scale
-					* (quad.y0() / (float) Application.getSettings().getHeight());
-			data.uv[uv++] = quad.s1();
-			data.uv[uv++] = quad.t0();
+			data.positions[pos++] = x0;
+			data.positions[pos++] = -y1 - offset;
+			data.uv[uv++] = u0;
+			data.uv[uv++] = v1;
 			// vertex 2
-			data.positions[pos++] = font_scale
-					* (quad.x1() / (float) Application.getSettings().getWidth());
-			data.positions[pos++] = -font_scale
-					* (quad.y1() / (float) Application.getSettings().getHeight());
-			data.uv[uv++] = quad.s1();
-			data.uv[uv++] = quad.t1();
+			data.positions[pos++] = x1;
+			data.positions[pos++] = -y1 - offset;
+			data.uv[uv++] = u1;
+			data.uv[uv++] = v1;
 			// vertex 3
-			data.positions[pos++] = font_scale
-					* (quad.x0() / (float) Application.getSettings().getWidth());
-			data.positions[pos++] = -font_scale
-					* (quad.y1() / (float) Application.getSettings().getHeight());
-			data.uv[uv++] = quad.s0();
-			data.uv[uv++] = quad.t1();
+			data.positions[pos++] = x1;
+			data.positions[pos++] = -y0 - offset;
+			data.uv[uv++] = u1;
+			data.uv[uv++] = v0;
 			// triangle 0
 			data.indices[index++] = last_index + 0;
 			data.indices[index++] = last_index + 2;
@@ -221,24 +235,35 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			data.indices[index++] = last_index + 2;
 			last_index += 4;
 
-			// add up the total line_width
-			if(font_scale * quad.x1() > text_width) {				
-				text_width = font_scale * quad.x1();
-			}
+			// if the xbuffer is bigger its the new width.
+			float xb_scaled = xb.get(0) * scale_factor;
+			text_width = (xb_scaled > text_width) ? xb_scaled : text_width;
 		}
-		
-		if(text_height == 0.0f) {
-			text_height = getHeight(size);
-		}
+
+		// computes the size of the box
+		text_height = (text_height == 0) ? baked_line_height : text_height;
+		out_text_height = text_height * scale_factor;
+
+		System.out.println("FINAL");
+		System.out.println("text width: " + text_width);
+		System.out.println("text height: " + out_text_height);
+		outDimensions.set(text_width, out_text_height);
 		// go ahead and process the mesh data now.
 		data.process();
-		// todo: try to avoid making a instance of vec2 here.
-		return new Vec2(text_width, text_height);
 	}
 
+	public float scale(float center, float offset, float factor) {
+		return (offset - center) * factor + center;
+	}
+	
 	@Override
 	public void setReady(boolean value) {
 		this.isReady = value;
+	}
+
+	@Override
+	public boolean isReady() {
+		return isReady;
 	}
 
 	@Override
@@ -259,23 +284,21 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		this.texture = texture;
 	}
 
-	public float getHeight(float font_size) {
-		return ((2.0f * font_size * Application.getSettings().getHeight()) / BAKED_FONT_PIXEL_SIZE) * (scale);
-	}
 
 	public enum FontStyle {
-		NORMAL, 
-		BOLD, 
-		ITALIC
+		NORMAL, BOLD, ITALIC
 	}
 
 	@Override
 	public void remove() {
+		memFree(xb);
+		memFree(yb);
+		quad.free();
 		chardata.free();
 		font_info.free();
 		AssetManager.unload(texture);
 	}
-	
+
 	private boolean isFilenameValid(String filename) {
 		return filename != null && (filename.toLowerCase().endsWith(".ttf") || filename.toLowerCase().endsWith(".otf"));
 	}

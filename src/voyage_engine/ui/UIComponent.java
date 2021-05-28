@@ -1,5 +1,6 @@
 package voyage_engine.ui;
 
+import voyage_engine.Application;
 import voyage_engine.util.Vec2;
 
 public abstract class UIComponent {
@@ -21,7 +22,7 @@ public abstract class UIComponent {
 		setAnchor(anchor);
 		setPosition(x, y);
 		setDimensions(w, h);
-		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
+		updateVisiblePosition();
 	}
 	
 	public void setVisibility(boolean vis) {
@@ -30,17 +31,59 @@ public abstract class UIComponent {
 	
 	public void setPosition(float x, float y) {
 		position.set(x, y);
-		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
+		updateVisiblePosition();
 	}
 	
 	public void setDimensions(float length, float height) {
 		dimensions.set(length, height);
-		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
+		updateVisiblePosition();
 	}
 	
 	public void setAnchor(UIAnchor anchor) {
 		this.anchor = anchor;
-		UIAnchor.computeVisiblePosition(anchor, position, dimensions, visiblePos);
+		updateVisiblePosition();
+	}
+
+	// this assumes the origin is the upper left corner of the mesh.
+	public void updateVisiblePosition() {
+		switch(anchor) {
+			case BOTTOM_CENTER:
+				visiblePos.x = position.x - ((dimensions.x / 2) / (float) Application.getWidth());
+				visiblePos.y = position.y;
+				break;
+			case BOTTOM_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y;
+				break;
+			case BOTTOM_RIGHT:
+				visiblePos.x = position.x - ((dimensions.x) / (float) Application.getWidth());
+				visiblePos.y = position.y;
+				break;
+			case MIDDLE_CENTER:
+				visiblePos.x = position.x - ((dimensions.x / 2) / (float) Application.getWidth());
+				visiblePos.y = position.y + ((dimensions.y / 2) / (float) Application.getHeight());
+				break;
+			case MIDDLE_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y + ((dimensions.y / 2) / (float) Application.getHeight());
+				break;
+			case MIDDLE_RIGHT:
+				visiblePos.x = position.x - ((dimensions.x) / (float) Application.getWidth());
+				visiblePos.y = position.y + ((dimensions.y / 2) / (float) Application.getHeight());
+				break;
+			case TOP_CENTER:
+				visiblePos.x = position.x - ((dimensions.x / 2) / (float) Application.getWidth());
+				visiblePos.y = position.y + ((dimensions.y) / (float) Application.getHeight());
+				break;
+			case TOP_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y + ((dimensions.y) / (float) Application.getHeight());
+				break;
+			case TOP_RIGHT:
+				visiblePos.x = position.x - ((dimensions.x) / (float) Application.getWidth());
+				visiblePos.y = position.y + ((dimensions.y) / (float) Application.getHeight());
+				break;
+		}
 	}
 	
 	public Vec2 getPosition() {
@@ -51,7 +94,7 @@ public abstract class UIComponent {
 		return visiblePos;
 	}
 	
-	public Vec2 getDimensions() {
+	public Vec2 getdimensionsensions() {
 		return dimensions;
 	}
 

@@ -1,5 +1,6 @@
 package voyage_engine.ui;
 
+import voyage_engine.Application;
 import voyage_engine.assets.AssetManager;
 import voyage_engine.assets.font.Font;
 import voyage_engine.assets.mesh.Mesh;
@@ -7,7 +8,6 @@ import voyage_engine.graphics.Color;
 import voyage_engine.graphics.IRenderable;
 import voyage_engine.graphics.OpenGL;
 import voyage_engine.graphics.Shader;
-import voyage_engine.util.Vec2;
 
 public class UILabel extends UIComponent implements IRenderable {
 	
@@ -39,8 +39,8 @@ public class UILabel extends UIComponent implements IRenderable {
 		if(!text.equals(t)) {
 			// we need to re-mesh now that the text has changed.
 			text = t;
-			Vec2 dim = font.generateMesh(mesh, text, size);
-			setDimensions(dim.getX(), dim.getY());
+			font.generateMesh(mesh, text, size, dimensions);
+			updateVisiblePosition();
 		}
 	}
 	
@@ -54,14 +54,57 @@ public class UILabel extends UIComponent implements IRenderable {
 	}
 
 	@Override
+	public void updateVisiblePosition() {
+		switch(anchor) {
+			case BOTTOM_CENTER:
+				visiblePos.x = position.x - (dimensions.x / 2f);
+				visiblePos.y = position.y + dimensions.y;
+				break;
+			case BOTTOM_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y + dimensions.y;
+				break;
+			case BOTTOM_RIGHT:
+				visiblePos.x = position.x - dimensions.x;
+				visiblePos.y = position.y + dimensions.y;
+				break;
+			case MIDDLE_CENTER:
+				visiblePos.x = position.x - (dimensions.x / 2f);
+				visiblePos.y = position.y + (dimensions.y / 2f);
+				break;
+			case MIDDLE_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y + (dimensions.y / 2f);
+				break;
+			case MIDDLE_RIGHT:
+				visiblePos.x = position.x - dimensions.x;
+				visiblePos.y = position.y + (dimensions.y / 2f);
+				break;
+			case TOP_CENTER:
+				visiblePos.x = position.x - (dimensions.x / 2f);
+				visiblePos.y = position.y;
+				break;
+			case TOP_LEFT:
+				visiblePos.x = position.x;
+				visiblePos.y = position.y;
+				break;
+			case TOP_RIGHT:
+				visiblePos.x = position.x - dimensions.x;
+				visiblePos.y = position.y;
+				break;
+		}
+		visiblePos.x /= (float) Application.getWidth();
+		visiblePos.y /= (float) Application.getHeight();
+	}
+
+	@Override
 	public void render() {
 		OpenGL.checkEnableShader(shader);
-		
 		OpenGL.bindMesh(mesh);
 		OpenGL.bindTexture(font.getTexture());
 		
 		OpenGL.loadMatrix("orthogonal", OpenGL.getCamera().getOrthogonalMatrix());
-		OpenGL.loadVector2("translation", (float) getVisiblePosition().x, - getVisiblePosition().y / 2f);
+		OpenGL.loadVector2("translation", (float) getVisiblePosition().x, getVisiblePosition().y);
 		OpenGL.loadColor("color", color);
 		
         OpenGL.draw();

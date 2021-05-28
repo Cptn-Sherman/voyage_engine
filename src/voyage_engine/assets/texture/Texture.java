@@ -5,6 +5,7 @@ import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
@@ -16,8 +17,7 @@ import voyage_engine.assets.IGPUAsset;
 
 public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
     private int textureID;
-    private boolean filter;
-    private boolean mipmap;
+    private boolean filter, mipmap;
     private int width, height;
 
     public Texture() {
@@ -43,7 +43,7 @@ public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
             image = STBImage.stbi_load("data\\" + getFilename(), w, h, comp, 4);
             // error out if the image failed to load for some reason.
             if (image == null) {
-                throw new RuntimeException("[content|thread]: failed loading file, no file found: " + getFilename()
+                throw new RuntimeException("[asset|thread]: failed loading file, no file found: " + getFilename()
                         + "\n reason: " + STBImage.stbi_failure_reason());
             }
             width = w.get();
@@ -111,4 +111,8 @@ public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
 	public boolean returnsData() {
 		return true;
 	}
+
+    public static ByteBuffer createByteBuffer (int size) {
+        return BufferUtils.createByteBuffer(size);
+    }
 }
