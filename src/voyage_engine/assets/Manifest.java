@@ -7,10 +7,10 @@ import java.util.HashMap;
 import spool.IJsonSource;
 
 public class Manifest implements IJsonSource {
-	HashMap<String, String> filenameToPath;
-	HashMap<String, Long> filenameToID;
-	HashMap<String, Long> folderToLastID;
-	long highestID;
+	private HashMap<String, String> filenameToPath;
+	private HashMap<String, Long> filenameToID;
+	private HashMap<String, Long> folderToLastID;
+	private long highestID;
 
 	public Manifest() {
 		filenameToPath = new HashMap<String, String>();
@@ -27,19 +27,18 @@ public class Manifest implements IJsonSource {
 			}
 		};
 		String relativePath = new File("data\\").getAbsolutePath().toString();
-		System.out.println("relative path: " + relativePath);
+		System.out.println("[manifest]: relative path: " + relativePath);
 		File[] folders = new File("data\\").listFiles(directoryFilter);
-		System.out.println("[manifest]: printing game data...");
+		System.out.println("[manifest]: printing...");
 		boolean folderFound = false;
 		long lastID = 0L;
 		for (File folder : folders) {
-			
 			// check to see if a last ID was recorded for this folder name.
 			Long folderLastID = folderToLastID.get(folder.toString());
 			if (folderLastID != null) {
 				lastID = folderLastID.longValue();
 				folderFound = true;
-				System.out.println("using last ID: " + lastID);
+				System.out.println("[manifest]: using last ID: " + lastID);
 			} else {
 				lastID = highestID;
 			}

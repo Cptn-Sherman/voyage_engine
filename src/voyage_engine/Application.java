@@ -90,7 +90,8 @@ public class Application {
 	}
 	
 	public void render() {
-		
+		if(currentState != null)
+			currentState.render();		
 	}
 
 	protected void init() {
@@ -98,7 +99,7 @@ public class Application {
 		window.create();
 		OpenGL.init();
 		Input.init(window.getAddress());
-		AssetManager.init(true);
+		AssetManager.init(false);
 		// print version information
 		System.out.println("[client]: lwjgl version: " + Version.getVersion());
 		System.out.println("[client]: OpenGL version " + GL11.glGetString(GL11.GL_VERSION));
@@ -143,8 +144,6 @@ public class Application {
 		return window.isFocused();
 	}
 
-
-	
 	public static int getFPS() {
 		return fps;
 	}

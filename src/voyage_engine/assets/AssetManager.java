@@ -22,34 +22,24 @@ public class AssetManager {
 	private static HashMap<Long, Asset> assetMap;
 
 	public static void init(boolean rebaseManifest) {
+		// Start spool and use the default initializer to auto detect thread count.
+		Spool.init();
 		assetMap = new HashMap<Long, Asset>();
 
 		System.out.println("[manifest]: loading manifest...");
-
-		if (!rebaseManifest) {
+		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
 			manifest = loadFromJsonAllowFailure("data\\manifest.json", Manifest.class, true);
 			// if the manifest file was not loaded a new one will be compiled and saved to
 			// the disk.
-			if (manifest == null) {
-				System.out.println("[manifest]: manifest was not found, compiling new manifest...");
-				manifest = new Manifest();
-				manifest.compile();
-			}
-		} else {
-			manifest = loadFromJsonAllowFailure("data\\manifest.json", Manifest.class, true);
-			// if the manifest file was not loaded a new one will be compiled and saved to
-			// the disk.
-			if (manifest == null) {
-				System.out.println("[manifest]: rebasing manifest...");
-				manifest = new Manifest();
-				manifest.compile();
-			} else {
-				manifest.compile();
-			}
 		}
-		
-		// Start spool and use the default initializer to auto detect thread count.
-		Spool.init();
+		// if the manifest failed to load or if rebase is set to true a new manifest must be generated.
+		if (manifest == null) {
+			System.out.println("[manifest]: generating new manifest...");
+			manifest = new Manifest();
+		}
+		// compile the manifest, checking for new assets or changes.
+		manifest.compile();
+		System.out.println("[manifest]: successfully loaded!");
 	}
 
 	// check the data queue for assets that need to be uploaded to the gpu.
@@ -122,7 +112,7 @@ public class AssetManager {
 	}
 
 	public static void writeToJson(IJsonSource content, String filepath, boolean writeAll) {
-		System.out.println("[content]: writing json data...");
+		System.out.println("[assets]: writing json data...");
 		Gson gson;
 		if (writeAll) {
 			gson = new GsonBuilder().setPrettyPrinting().create();
@@ -172,9 +162,9 @@ public class AssetManager {
 			reader.close();
 		} catch (JsonIOException e) {
 			System.out.println(
-					"[content]: Warning! issues occured reading JSON: " + filename + " however, failure was allowed.");
+					"[assets]: Warning! issues occured reading JSON: " + filename + " however, failure was allowed.");
 		} catch (IOException e) {
-			System.out.println("[content]: Warning! issues occured with IO operations: " + filename
+			System.out.println("[assets]: Warning! issues occured with IO operations: " + filename
 					+ " however, failure was allowed.");
 		}
 		return content;
@@ -196,7 +186,7 @@ public class AssetManager {
 		
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
-		System.out.println("[content]: unloading " + assetMap.size() + " stored asset(s)...");
+		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
 		for (Asset asset : assetMap.values()) {
 			unload(asset);
 		}

@@ -25,8 +25,8 @@ public class Input {
 	private static List<MouseButton> lastMouseButtons = new ArrayList<MouseButton>();
 	private static List<MouseButton> currentMouseButtons = new ArrayList<MouseButton>();
 	private static Vec2 lastMouse = new Vec2();
-	public static Vec2 currentMouse = new Vec2();
-	public static Vec2 mouseDelta = new Vec2();
+	private static Vec2 currentMouse = new Vec2();
+	private static Vec2 mouseDelta = new Vec2();
 
 	public static void init(long w) {
 		System.out.println("[client]: initializing input map...");
@@ -260,6 +260,14 @@ public class Input {
 
 	public static boolean isMouseButtonDebounceUp(MouseButton mb) {
 		return !currentMouseButtons.contains(mb) && lastMouseButtons.contains(mb);
+	}
+
+	public static Vec2 currentMousePosition() {
+		return currentMouse;
+	}
+
+	public static Vec2 currentMouseDelta() {
+		return mouseDelta;
 	}
 
 	public enum Key {

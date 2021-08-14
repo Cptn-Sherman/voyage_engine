@@ -50,22 +50,25 @@ import voyage_engine.util.Vec2;
 
 public class Font extends Asset implements IInstantLoad, IGPUAsset {
 	private static final int BITMAP_W = 2048, BITMAP_H = 2048;
-	private static final float BAKED_FONT_PIXEL_SIZE = 128.0f;
+	private static final float BAKED_FONT_SIZE = 128.0f;
+	private static final int DEFAULT_OVERSAMPLE = 2;
+	private static final boolean DEFAULT_FILTER = true;
 	// inputs
-	String filename;
-	FontStyle style;
-	Texture texture;
-	boolean filter;
-	int oversampling = 1;
+	private String filename;
+	private FontStyle style;
+	private Texture texture;
+	private boolean filter;
+	private int oversampling = 1;
 	
 	private STBTTFontinfo font_info;
 	private STBTTPackedchar.Buffer chardata;
-	
 	private final STBTTAlignedQuad quad;
 	private final FloatBuffer xb;
 	private final FloatBuffer yb;
 
-	private float ascent, descent, lineGap, baked_line_height, baked_line_spacing, baked_font_scale_factor;
+	public Font (String filename) {
+		this(filename, DEFAULT_OVERSAMPLE, DEFAULT_FILTER);
+	}
 
 	public Font(String filename, int oversampling, boolean filter) {
 		super(true);
@@ -73,7 +76,6 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		this.filter = filter;
 		this.oversampling = oversampling;
 		texture = new Texture();
-
 		// create constants for getting character information
 		// used to build the text meshes.
 		chardata = STBTTPackedchar.malloc(96);
@@ -86,7 +88,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 	public void load() {
 		if (!isFilenameValid(filename)) {
 			System.out.println(
-					"[content]: Error font could not be loaded. \n\t" 
+					"[asset]: Error font could not be loaded. \n\t" 
 					+ "No filename provided or filename did not end with \".ttf\" or \".otf\".");
 			return;
 		}
@@ -105,9 +107,8 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			// set the oversampling values to allow smaller resolutions to render more
 			// crisp.
 			stbtt_PackSetOversampling(pc, oversampling, oversampling);
-			baked_font_scale_factor = stbtt_ScaleForPixelHeight(font_info, BAKED_FONT_PIXEL_SIZE);
 			// write the characters on the bytebuffer.
-			stbtt_PackFontRange(pc, ttf, 0, BAKED_FONT_PIXEL_SIZE, 32, chardata);
+			stbtt_PackFontRange(pc, ttf, 0, BAKED_FONT_SIZE, 32, chardata);
 			// end the writing on the buffer.
 			stbtt_PackEnd(pc);
 			// store the texture on the gpu.
@@ -122,29 +123,12 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			}
 			// unbind the texture.
 			glBindTexture(GL_TEXTURE_2D, 0);
-			System.out.println("[content]: generated font texture for: " + filename);
-
-			try (MemoryStack stack = stackPush()) {
-				IntBuffer bufAscent = stack.mallocInt(1);
-				IntBuffer bufDescent = stack.mallocInt(1);
-				IntBuffer bufLineGap = stack.mallocInt(1);
-				stbtt_GetFontVMetrics(font_info, bufAscent, bufDescent, bufLineGap);
-				ascent = bufAscent.get(0);
-				descent = bufDescent.get(0);
-				lineGap = bufLineGap.get(0);
-				baked_line_height = (ascent - descent + lineGap) * baked_font_scale_factor;
-				System.out.println("ascent = " + ascent);
-				System.out.println("descent = " + descent);
-				System.out.println("lineGap = " + lineGap);
-				System.out.println("font_scale_factor = " + baked_font_scale_factor);
-				System.out.println("baked line height = " + baked_line_height);
-			}
-
+			System.out.println("[asset]: generated font texture for: " + filename);
 		} catch (IOException e) {
-			System.out.println("[content]: ERROR something went wrong loading the font: " + filename);
+			System.out.println("[asset]: ERROR something went wrong loading the font: " + filename);
 			throw new RuntimeException(e);
 		}
-		System.out.println("[content]: loaded font: " + filename);
+		System.out.println("[asset]: loaded font: " + filename);
 	}
 
 	public void generateMesh(Mesh mesh, String text, int desired_size, Vec2 outDimensions) {
@@ -165,7 +149,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		// set up counter variables to find array position.
 		int pos = 0, uv = 0, index = 0, last_index = 0;
 		// calculate the actual size for the characters.
-		float scale_factor = (float) desired_size / (float) BAKED_FONT_PIXEL_SIZE;
+		float scale_factor = (float) desired_size / (float) BAKED_FONT_SIZE;
 		float text_height = 0f, text_width = 0f, out_text_height = 0f; 
 		float x0, x1, y0, y1, u0, v0, u1, v1, offset;
 
@@ -174,7 +158,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 
 			if(text.charAt(i) == '\n') { 
 				// the baked line height is used because the yb assumes Baked size spacing the scaling is done later.
-				text_height += baked_line_height;
+				text_height += BAKED_FONT_SIZE;
 				xb.put(0, 0f);
 				yb.put(0, text_height); // advance the y position by some amount
 				continue;
@@ -193,12 +177,11 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 
 			stbtt_GetPackedQuad(chardata, BITMAP_W, BITMAP_H, text.charAt(i) - 32, xb, yb, quad, false);
 			
+			offset = BAKED_FONT_SIZE * scale_factor / (float) Application.getHeight();
 			x0 = quad.x0() * scale_factor / (float) Application.getWidth();
 			x1 = quad.x1() * scale_factor / (float) Application.getWidth();
 			y0 = quad.y0() * scale_factor / (float) Application.getHeight();
 			y1 = quad.y1() * scale_factor / (float) Application.getHeight();
-			offset = BAKED_FONT_PIXEL_SIZE * scale_factor / (float) Application.getHeight();
-			System.out.println("offset was: " + offset);
 			// read texture coordinates from packed quad
 			u0 = quad.s0();
 			v0 = quad.t0();
@@ -239,16 +222,12 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			float xb_scaled = xb.get(0) * scale_factor;
 			text_width = (xb_scaled > text_width) ? xb_scaled : text_width;
 		}
-
 		// computes the size of the box
-		text_height = (text_height == 0) ? baked_line_height : text_height;
+		text_height = (text_height == 0) ? BAKED_FONT_SIZE : text_height;
 		out_text_height = text_height * scale_factor;
-
-		System.out.println("FINAL");
-		System.out.println("text width: " + text_width);
-		System.out.println("text height: " + out_text_height);
+		// set the return values for the bounding box surrounding the text.
 		outDimensions.set(text_width, out_text_height);
-		// go ahead and process the mesh data now.
+		// process the mesh data.
 		data.process();
 	}
 

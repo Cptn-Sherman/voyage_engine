@@ -14,4 +14,14 @@ public class BiomeDefinition extends TaggableContent {
     public BiomeDefinition() {
         super();
     }
+
+
+
+
+
+
+
+
+
+
 }
