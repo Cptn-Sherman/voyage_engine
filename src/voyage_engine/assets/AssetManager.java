@@ -15,7 +15,7 @@ import spool.IJsonSource;
 import spool.Spool;
 import voyage_engine.assets.font.Font;
 import voyage_engine.assets.texture.Texture;
-import voyage_engine.graphics.Shader;
+import voyage_engine.assets.shader.Shader;
 
 public class AssetManager {
 	private static Manifest manifest;
@@ -88,7 +88,7 @@ public class AssetManager {
 	}
 
 	// returns the requested shader file
-	public static Shader getShader(String filename) {
+	public static voyage_engine.assets.shader.Shader getShader(String filename) {
 		long id = manifest.getID(filename);
 		Shader shader = (Shader) assetMap.get(id);
 		if (shader == null) {

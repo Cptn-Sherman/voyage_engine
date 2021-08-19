@@ -115,4 +115,8 @@ public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
     public static ByteBuffer createByteBuffer (int size) {
         return BufferUtils.createByteBuffer(size);
     }
+
+    public static ByteBuffer createByteBuffer (int width, int height, int bpp) {
+        return createByteBuffer(width * height * bpp);
+    }
 }

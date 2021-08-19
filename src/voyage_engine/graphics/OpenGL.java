@@ -10,12 +10,12 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import voyage_engine.assets.mesh.Mesh;
+import voyage_engine.assets.shader.Shader;
 import voyage_engine.assets.texture.Texture;
 import voyage_engine.util.Matrix4f;
 import voyage_engine.util.Vec2;
 import voyage_engine.util.Vec3;
 import voyage_engine.util.Vec4;
-
 
 public class OpenGL {
     private static boolean wireframe = false;
@@ -107,7 +107,7 @@ public class OpenGL {
         GL20.glUniform4f(activeShader.getUniformLocation(locationName), value.x, value.y, value.z, value.w);
     }
 
-    public static void loadVector4(String locationName, float x, float y, float z , float w) {
+    public static void loadVector4(String locationName, float x, float y, float z, float w) {
         GL20.glUniform4f(activeShader.getUniformLocation(locationName), x, y, z, w);
     }
 

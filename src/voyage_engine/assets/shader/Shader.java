@@ -1,4 +1,4 @@
-package voyage_engine.graphics;
+package voyage_engine.assets.shader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -38,7 +38,7 @@ public class Shader extends Asset implements IInstantLoad, IJsonSource, IGPUAsse
 		GL20.glUseProgram(0);
 	}
 	
-	int getUniformLocation(String locationName) {
+	public int getUniformLocation(String locationName) {
 		Integer ulocation = uniformHashLocation.get(locationName.hashCode());
 		if(ulocation == null) {
 			ulocation = GL20.glGetUniformLocation(id, locationName);

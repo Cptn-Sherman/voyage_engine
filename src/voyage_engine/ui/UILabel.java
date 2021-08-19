@@ -7,7 +7,7 @@ import voyage_engine.assets.mesh.Mesh;
 import voyage_engine.graphics.Color;
 import voyage_engine.graphics.IRenderable;
 import voyage_engine.graphics.OpenGL;
-import voyage_engine.graphics.Shader;
+import voyage_engine.assets.shader.Shader;
 
 public class UILabel extends UIComponent implements IRenderable {
 	

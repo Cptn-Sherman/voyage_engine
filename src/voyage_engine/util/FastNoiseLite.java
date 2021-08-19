@@ -411,7 +411,7 @@ public class FastNoiseLite
     /// <code>DomainWarp(coord)
     /// noise = GetNoise(x, y)</code>
     /// </example>
-    public void DomainWarp(Vector2 coord)
+    public void DomainWarp(Vec2 coord)
     {
         switch (mFractalType)
         {
@@ -435,7 +435,7 @@ public class FastNoiseLite
     /// <code>DomainWarp(coord)
     /// noise = GetNoise(x, y, z)</code>
     /// </example>
-    public void DomainWarp(Vector3 coord)
+    public void DomainWarp(Vec3 coord)
     {
         switch (mFractalType)
         {
@@ -1891,7 +1891,7 @@ public class FastNoiseLite
 
     // Domain Warp
 
-    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord)
+    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vec2 coord)
     {
         switch (mDomainWarpType)
         {
@@ -1907,7 +1907,7 @@ public class FastNoiseLite
         }
     }
 
-    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord)
+    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vec3 coord)
     {
         switch (mDomainWarpType)
         {
@@ -1926,7 +1926,7 @@ public class FastNoiseLite
 
     // Domain Warp Single Wrapper
 
-    private void DomainWarpSingle(Vector2 coord)
+    private void DomainWarpSingle(Vec2 coord)
     {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
@@ -1952,7 +1952,7 @@ public class FastNoiseLite
         DoSingleDomainWarp(seed, amp, freq, xs, ys, coord);
     }
 
-    private void DomainWarpSingle(Vector3 coord)
+    private void DomainWarpSingle(Vec3 coord)
     {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
@@ -2001,7 +2001,7 @@ public class FastNoiseLite
 
     // Domain Warp Fractal Progressive
 
-    private void DomainWarpFractalProgressive(Vector2 coord)
+    private void DomainWarpFractalProgressive(Vec2 coord)
     {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
@@ -2034,7 +2034,7 @@ public class FastNoiseLite
         }
     }
 
-    private void DomainWarpFractalProgressive(Vector3 coord)
+    private void DomainWarpFractalProgressive(Vec3 coord)
     {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
@@ -2089,7 +2089,7 @@ public class FastNoiseLite
 
 
     // Domain Warp Fractal Independant
-    private void DomainWarpFractalIndependent(Vector2 coord)
+    private void DomainWarpFractalIndependent(Vec2 coord)
     {
         /*FNLfloat*/ float xs = coord.x;
         /*FNLfloat*/ float ys = coord.y;
@@ -2122,7 +2122,7 @@ public class FastNoiseLite
         }
     }
 
-    private void DomainWarpFractalIndependent(Vector3 coord)
+    private void DomainWarpFractalIndependent(Vec3 coord)
     {
         /*FNLfloat*/ float xs = coord.x;
         /*FNLfloat*/ float ys = coord.y;
@@ -2178,7 +2178,7 @@ public class FastNoiseLite
 
     // Domain Warp Basic Grid
 
-    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord)
+    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vec2 coord)
     {
         /*FNLfloat*/ float xf = x * frequency;
         /*FNLfloat*/ float yf = y * frequency;
@@ -2210,7 +2210,7 @@ public class FastNoiseLite
         coord.y += Lerp(ly0x, ly1x, ys) * warpAmp;
     }
 
-    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord)
+    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vec3 coord)
     {
         /*FNLfloat*/ float xf = x * frequency;
         /*FNLfloat*/ float yf = y * frequency;
@@ -2270,7 +2270,7 @@ public class FastNoiseLite
 
 
     // Domain Warp Simplex/OpenSimplex2
-    private void SingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord, boolean outGradOnly)
+    private void SingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vec2 coord, boolean outGradOnly)
     {
         final float SQRT3 = 1.7320508075688772935274463415059f;
         final float G2 = (3 - SQRT3) / 6;
@@ -2427,7 +2427,7 @@ public class FastNoiseLite
         coord.y += vy * warpAmp;
     }
 
-    private void SingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord, boolean outGradOnly)
+    private void SingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vec3 coord, boolean outGradOnly)
     {
         x *= frequency;
         y *= frequency;
@@ -2583,29 +2583,5 @@ public class FastNoiseLite
         coord.x += vx * warpAmp;
         coord.y += vy * warpAmp;
         coord.z += vz * warpAmp;
-    }
-
-    public static class Vector2
-    {
-        public /*FNLfloat*/ float x;
-        public /*FNLfloat*/ float y;
-        public Vector2(/*FNLfloat*/ float x, /*FNLfloat*/ float y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    public static class Vector3
-    {
-        public /*FNLfloat*/ float x;
-        public /*FNLfloat*/ float y;
-        public /*FNLfloat*/ float z;
-        public Vector3(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
     }
 }
