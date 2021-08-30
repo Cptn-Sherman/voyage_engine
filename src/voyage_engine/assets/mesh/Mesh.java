@@ -6,11 +6,11 @@ import java.util.List;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
-import spool.Asset;
+import spool.SpoolAsset;
 import spool.IMultithreadLoad;
 import voyage_engine.assets.IGPUAsset;
 
-public class Mesh extends Asset implements IMultithreadLoad, IGPUAsset {
+public class Mesh extends SpoolAsset implements IMultithreadLoad, IGPUAsset {
 	int vao;
     List<Integer> vbo_list = new ArrayList<Integer>();
     int vertex_count;

@@ -10,12 +10,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
-import spool.Asset;
+import spool.SpoolAsset;
 import spool.IMultithreadLoad;
 import spool.Spool;
 import voyage_engine.assets.IGPUAsset;
 
-public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
+public class Texture extends SpoolAsset implements IMultithreadLoad, IGPUAsset {
     private int textureID;
     private boolean filter, mipmap;
     private int width, height;

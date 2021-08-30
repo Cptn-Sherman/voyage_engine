@@ -1,10 +1,10 @@
 package voyage_engine.assets.compute;
-import spool.Asset;
+import spool.SpoolAsset;
 import spool.IInstantLoad;
 import spool.IJsonSource;
 import voyage_engine.assets.IGPUAsset;
 
-public class ComputeShader extends Asset implements IInstantLoad, IJsonSource, IGPUAsset {
+public class ComputeShader extends SpoolAsset implements IInstantLoad, IJsonSource, IGPUAsset {
 
     public ComputeShader(boolean referenceCounted) {
         super(referenceCounted);

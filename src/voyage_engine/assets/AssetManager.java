@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
-import spool.Asset;
+import spool.SpoolAsset;
 import spool.IData;
 import spool.IJsonSource;
 import spool.Spool;
@@ -19,12 +19,12 @@ import voyage_engine.assets.shader.Shader;
 
 public class AssetManager {
 	private static Manifest manifest;
-	private static HashMap<Long, Asset> assetMap;
+	private static HashMap<Long, SpoolAsset> assetMap;
 
 	public static void init(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
 		Spool.init();
-		assetMap = new HashMap<Long, Asset>();
+		assetMap = new HashMap<Long, SpoolAsset>();
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
@@ -103,7 +103,7 @@ public class AssetManager {
 
 	// determines if the asset is reference counted and if the number of references
 	// has reached zero.
-	public static boolean checkUnstoreAsset(Asset asset) {
+	public static boolean checkUnstoreAsset(SpoolAsset asset) {
 		if (asset.isReferencedCounted() && asset.referenceCount() <= 0) {
 			assetMap.remove(asset.getAssetID());
 			return true;
@@ -170,13 +170,17 @@ public class AssetManager {
 		return content;
 	}
 	
-	public static void unload(Asset asset) {
-		asset.updateReferenceCount(-1);
-		// if the reference count has hit zero than remove the asset.
-		if(asset.referenceCount() < 0) {
-			assetMap.remove(asset.getAssetID());
-			if(asset instanceof IGPUAsset) {
-				((IGPUAsset) asset).remove();
+	public static void unload(SpoolAsset asset) {
+		if (asset == null) {
+			System.err.println("[assets]: Warning! attempted to unload a null asset!");
+		} else {
+			asset.updateReferenceCount(-1);
+			// if the reference count has hit zero than remove the asset.
+			if(asset.referenceCount() < 0) {
+				assetMap.remove(asset.getAssetID());
+				if(asset instanceof IGPUAsset) {
+					((IGPUAsset) asset).remove();
+				}
 			}
 		}
 	}
@@ -187,7 +191,7 @@ public class AssetManager {
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
-		for (Asset asset : assetMap.values()) {
+		for (SpoolAsset asset : assetMap.values()) {
 			unload(asset);
 		}
 	}

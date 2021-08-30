@@ -37,7 +37,7 @@ import org.lwjgl.stb.STBTTPackContext;
 import org.lwjgl.stb.STBTTPackedchar;
 import org.lwjgl.system.MemoryStack;
 
-import spool.Asset;
+import spool.SpoolAsset;
 import spool.IInstantLoad;
 import voyage_engine.Application;
 import voyage_engine.assets.AssetManager;
@@ -48,7 +48,7 @@ import voyage_engine.assets.texture.Texture;
 import voyage_engine.util.IOUtil;
 import voyage_engine.util.Vec2;
 
-public class Font extends Asset implements IInstantLoad, IGPUAsset {
+public class Font extends SpoolAsset implements IInstantLoad, IGPUAsset {
 	private static final int BITMAP_W = 2048, BITMAP_H = 2048;
 	private static final float BAKED_FONT_SIZE = 128.0f;
 	private static final int DEFAULT_OVERSAMPLE = 2;

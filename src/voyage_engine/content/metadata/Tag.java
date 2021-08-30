@@ -1,8 +1,8 @@
 package voyage_engine.content.metadata;
 
-import spool.Asset;
+import spool.SpoolAsset;
 
-public class Tag extends Asset {
+public class Tag extends SpoolAsset {
     private int ID;
     private String name;
     private Tag parent;
