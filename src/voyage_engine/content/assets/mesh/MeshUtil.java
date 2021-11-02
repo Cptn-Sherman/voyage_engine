@@ -1,4 +1,4 @@
-package voyage_engine.assets.mesh;
+package voyage_engine.content.assets.mesh;
 
 import voyage_engine.Application;
 

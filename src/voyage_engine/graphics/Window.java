@@ -35,7 +35,7 @@ import org.lwjgl.system.MemoryStack;
 
 import spool.Spool;
 import voyage_engine.Application;
-import voyage_engine.assets.screenshot.Screenshot;
+import voyage_engine.content.assets.screenshot.Screenshot;
 import voyage_engine.input.Input;
 import voyage_engine.input.Input.MouseButton;
 

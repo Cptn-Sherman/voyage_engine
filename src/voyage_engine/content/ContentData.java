@@ -1,6 +1,6 @@
 package voyage_engine.content;
 
-public abstract class ContentData {
+public abstract class ContentData extends Content {
    public long ID; 
 
    public long getID() {

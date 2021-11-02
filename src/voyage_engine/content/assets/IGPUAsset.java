@@ -1,4 +1,4 @@
-package voyage_engine.assets;
+package voyage_engine.content.assets;
 
 // IGPUAsset interface defines an asset that stores information on the GPU that needs to be removed when unloaded.
 public interface IGPUAsset {

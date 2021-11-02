@@ -1,4 +1,4 @@
-package voyage_engine.assets.screenshot;
+package voyage_engine.content.assets.screenshot;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,6 +17,7 @@ public class Screenshot implements IMultithreadProcess {
 	public String format;
 
 	public Screenshot(ByteBuffer buffer, String format, int width, int height, int bpp) {
+		System.out.println("taking a screenshot...");
 		this.buffer = buffer;
 		this.format = format;
 		this.width = width;
@@ -48,6 +49,6 @@ public class Screenshot implements IMultithreadProcess {
 		} catch (final IOException e) {
 			System.out.println("[ERROR]: could not save screenshot to: " + file.getPath());
 		}
-		System.out.println("[loader]: saved screenshot to: \n" + file.getPath());
+		System.out.println("[loader]: saved screenshot to: " + file.getPath());
 	}
 }

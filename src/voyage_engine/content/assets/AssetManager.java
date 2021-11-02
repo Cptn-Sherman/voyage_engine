@@ -1,4 +1,4 @@
-package voyage_engine.assets;
+package voyage_engine.content.assets;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -10,12 +10,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
 import spool.SpoolAsset;
+import voyage_engine.content.assets.font.Font;
+import voyage_engine.content.assets.shader.Shader;
+import voyage_engine.content.assets.texture.Texture;
 import spool.IData;
 import spool.IJsonSource;
 import spool.Spool;
-import voyage_engine.assets.font.Font;
-import voyage_engine.assets.texture.Texture;
-import voyage_engine.assets.shader.Shader;
 
 public class AssetManager {
 	private static Manifest manifest;
@@ -88,7 +88,7 @@ public class AssetManager {
 	}
 
 	// returns the requested shader file
-	public static voyage_engine.assets.shader.Shader getShader(String filename) {
+	public static voyage_engine.content.assets.shader.Shader getShader(String filename) {
 		long id = manifest.getID(filename);
 		Shader shader = (Shader) assetMap.get(id);
 		if (shader == null) {
@@ -104,7 +104,7 @@ public class AssetManager {
 	// determines if the asset is reference counted and if the number of references
 	// has reached zero.
 	public static boolean checkUnstoreAsset(SpoolAsset asset) {
-		if (asset.isReferencedCounted() && asset.referenceCount() <= 0) {
+		if (asset.isReferencedCounted() && asset.getReferenceCount() <= 0) {
 			assetMap.remove(asset.getAssetID());
 			return true;
 		}
@@ -169,6 +169,11 @@ public class AssetManager {
 		}
 		return content;
 	}
+
+	public static void preformSave() {
+		//Save save = new Save();
+		//Spool.addMultithreadProcess(save);
+	}
 	
 	public static void unload(SpoolAsset asset) {
 		if (asset == null) {
@@ -176,7 +181,7 @@ public class AssetManager {
 		} else {
 			asset.updateReferenceCount(-1);
 			// if the reference count has hit zero than remove the asset.
-			if(asset.referenceCount() < 0) {
+			if(asset.getReferenceCount() < 0) {
 				assetMap.remove(asset.getAssetID());
 				if(asset instanceof IGPUAsset) {
 					((IGPUAsset) asset).remove();
@@ -187,7 +192,6 @@ public class AssetManager {
 
 	public static void cleanup() {
 		System.out.println("[assets]: cleaning up...");
-		
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");

@@ -1,12 +1,12 @@
 package voyage_engine.ui;
 
-import voyage_engine.assets.AssetManager;
-import voyage_engine.assets.mesh.Mesh;
-import voyage_engine.assets.mesh.MeshUtil;
+import voyage_engine.content.assets.AssetManager;
+import voyage_engine.content.assets.mesh.Mesh;
+import voyage_engine.content.assets.mesh.MeshUtil;
+import voyage_engine.content.assets.shader.Shader;
 import voyage_engine.graphics.Color;
 import voyage_engine.graphics.IRenderable;
 import voyage_engine.graphics.OpenGL;
-import voyage_engine.assets.shader.Shader;
 import voyage_engine.util.Vec2;
 
 public class UIPanel extends UIComponent implements IRenderable {

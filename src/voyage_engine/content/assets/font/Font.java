@@ -1,4 +1,4 @@
-package voyage_engine.assets.font;
+package voyage_engine.content.assets.font;
 
 import static org.lwjgl.opengl.GL11.GL_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
@@ -40,11 +40,11 @@ import org.lwjgl.system.MemoryStack;
 import spool.SpoolAsset;
 import spool.IInstantLoad;
 import voyage_engine.Application;
-import voyage_engine.assets.AssetManager;
-import voyage_engine.assets.IGPUAsset;
-import voyage_engine.assets.mesh.Mesh;
-import voyage_engine.assets.mesh.MeshData;
-import voyage_engine.assets.texture.Texture;
+import voyage_engine.content.assets.AssetManager;
+import voyage_engine.content.assets.IGPUAsset;
+import voyage_engine.content.assets.mesh.Mesh;
+import voyage_engine.content.assets.mesh.MeshData;
+import voyage_engine.content.assets.texture.Texture;
 import voyage_engine.util.IOUtil;
 import voyage_engine.util.Vec2;
 

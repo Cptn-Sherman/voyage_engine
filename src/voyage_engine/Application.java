@@ -5,7 +5,7 @@ import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import org.lwjgl.Version;
 import org.lwjgl.opengl.GL11;
 
-import voyage_engine.assets.AssetManager;
+import voyage_engine.content.assets.AssetManager;
 import voyage_engine.graphics.OpenGL;
 import voyage_engine.graphics.Window;
 import voyage_engine.input.Input;

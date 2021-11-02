@@ -1,4 +1,4 @@
-package voyage_engine.assets.texture;
+package voyage_engine.content.assets.texture;
 
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
@@ -11,14 +11,13 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 import spool.SpoolAsset;
+import voyage_engine.content.assets.IGPUAsset;
 import spool.IMultithreadLoad;
 import spool.Spool;
-import voyage_engine.assets.IGPUAsset;
 
 public class Texture extends SpoolAsset implements IMultithreadLoad, IGPUAsset {
-    private int textureID;
+    private int textureID, width, height;
     private boolean filter, mipmap;
-    private int width, height;
 
     public Texture() {
 		super(true);

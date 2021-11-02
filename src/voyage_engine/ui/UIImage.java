@@ -1,6 +1,6 @@
 package voyage_engine.ui;
 
-import voyage_engine.assets.texture.Texture;
+import voyage_engine.content.assets.texture.Texture;
 import voyage_engine.graphics.IRenderable;
 
 public class UIImage extends UIComponent implements IRenderable {

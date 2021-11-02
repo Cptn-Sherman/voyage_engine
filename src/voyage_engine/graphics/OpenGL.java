@@ -9,9 +9,9 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import voyage_engine.assets.mesh.Mesh;
-import voyage_engine.assets.shader.Shader;
-import voyage_engine.assets.texture.Texture;
+import voyage_engine.content.assets.mesh.Mesh;
+import voyage_engine.content.assets.shader.Shader;
+import voyage_engine.content.assets.texture.Texture;
 import voyage_engine.util.Matrix4f;
 import voyage_engine.util.Vec2;
 import voyage_engine.util.Vec3;

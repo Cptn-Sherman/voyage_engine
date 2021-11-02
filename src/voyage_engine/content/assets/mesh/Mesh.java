@@ -1,4 +1,4 @@
-package voyage_engine.assets.mesh;
+package voyage_engine.content.assets.mesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,8 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
 import spool.SpoolAsset;
+import voyage_engine.content.assets.IGPUAsset;
 import spool.IMultithreadLoad;
-import voyage_engine.assets.IGPUAsset;
 
 public class Mesh extends SpoolAsset implements IMultithreadLoad, IGPUAsset {
 	int vao;

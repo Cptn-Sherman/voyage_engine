@@ -1,4 +1,4 @@
-package voyage_engine.assets;
+package voyage_engine.content.assets;
 
 import java.io.File;
 import java.io.FileFilter;
