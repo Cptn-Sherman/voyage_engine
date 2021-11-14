@@ -31,7 +31,7 @@ public class Screenshot implements IMultithreadProcess {
 		final Date date = new Date();
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 		// create the file and generate a buffered image.
-		final File file = new File("screenshots" + "//" + dateFormat.format(date) + ".png"); // The file to																						// save to.
+		final File file = new File("data//screenshots" + "//" + dateFormat.format(date) + ".png"); // The file to																						// save to.
 		final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		// convert to RGB.
 		for (int x = 0; x < width; x++) {
@@ -46,9 +46,9 @@ public class Screenshot implements IMultithreadProcess {
 		// try to write the image to the disk in the screenshots folder.
 		try {
 			ImageIO.write(image, format, file);
+			System.out.println("[loader]: saved screenshot to: " + file.getPath());
 		} catch (final IOException e) {
 			System.out.println("[ERROR]: could not save screenshot to: " + file.getPath());
 		}
-		System.out.println("[loader]: saved screenshot to: " + file.getPath());
 	}
 }

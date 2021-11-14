@@ -1,1 +1,2 @@
-bin/voyage_engine/**
+.gitignore
+bin\voyage_engine\*
