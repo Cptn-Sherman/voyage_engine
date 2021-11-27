@@ -23,6 +23,8 @@ public class Application {
 	// application performance metrics.
     private static int frame_count, tick_count;
 	private static int fps, tps;
+	private static long free_memory, used_memory, total_memory, max_memory;
+	private static float used_memory_percentage;
 	
 	public Application() {
 		window = new Window();
@@ -101,9 +103,13 @@ public class Application {
 		Input.init(window.getAddress());
 		AssetManager.init(false);
 		// print version information
-		System.out.println("[client]: lwjgl version: " + Version.getVersion());
-		System.out.println("[client]: OpenGL version " + GL11.glGetString(GL11.GL_VERSION));
-		System.out.println("[client]: OS: " + System.getProperty("os.name"));
+		String maxMemory = (Runtime.getRuntime().maxMemory() == Long.MAX_VALUE) ? "no limit" : ((Runtime.getRuntime().maxMemory() / (1024 * 1024)) + "MB");
+		System.out.println("[client]: os: " + System.getProperty("os.name"));
+		System.out.println("[client]: arch: " + System.getProperty("os.arch"));
+		System.out.println("[client]: java: " + System.getProperty("java.version"));		
+		System.out.println("[client]: openGL: " + GL11.glGetString(GL11.GL_VERSION));
+		System.out.println("[client]: lwjgl: " + Version.getVersion());
+		System.out.println("[client]: memory: " + maxMemory);
 	}
 	
 	protected void tick(double delta) {
@@ -120,7 +126,19 @@ public class Application {
 	protected void slowTick() {
 		if(currentState != null)
 			currentState.slowTick();
+		// get values for memory usage.
+		max_memory = Runtime.getRuntime().maxMemory();
+		free_memory = Runtime.getRuntime().freeMemory();
+		total_memory = Runtime.getRuntime().totalMemory();
+		// compute used memory.
+		used_memory = total_memory - free_memory;
+		// compute used memory as percentage.
+		used_memory_percentage = (float) used_memory / (float) total_memory;
+		used_memory_percentage *= 100;
+		used_memory_percentage = Math.round(used_memory_percentage);
+		// print fps, tps, and memory usage.
 		System.out.println(frame_count + " frames, " + tick_count + " ticks");
+		System.out.println("[" + used_memory_percentage + "%] used: " + byteToMegabyte(used_memory) + "MB , total: " + byteToMegabyte(total_memory) + "MB");
 	}
 	
 	protected void dispose() {
@@ -158,5 +176,9 @@ public class Application {
 
 	public static int getHeight() {
 		return window.getHeight();
+	}
+
+	private static long byteToMegabyte(long val) {
+		return val / (1024 * 1024);
 	}
 }
