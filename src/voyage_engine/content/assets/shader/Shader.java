@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import com.google.gson.annotations.Expose;
 
-import spool.SpoolAsset;
+import voyage_engine.content.assets.Asset;
 import voyage_engine.content.assets.AssetManager;
 import voyage_engine.content.assets.IGPUAsset;
 import spool.IInstantLoad;
@@ -16,7 +16,7 @@ import spool.IJsonSource;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-public class Shader extends SpoolAsset implements IInstantLoad, IJsonSource, IGPUAsset {
+public class Shader extends Asset implements IInstantLoad, IJsonSource, IGPUAsset {
 	private int id;
 	private int vertexShaderID;
 	private int fragmentShaderID;

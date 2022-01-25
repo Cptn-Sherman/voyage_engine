@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
-import spool.SpoolAsset;
 import voyage_engine.content.assets.font.Font;
 import voyage_engine.content.assets.shader.Shader;
 import voyage_engine.content.assets.texture.Texture;
@@ -19,12 +18,12 @@ import spool.Spool;
 
 public class AssetManager {
 	private static Manifest manifest;
-	private static HashMap<Long, SpoolAsset> assetMap;
+	private static HashMap<Long, Asset> assetMap;
 
 	public static void init(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
-		Spool.init();
-		assetMap = new HashMap<Long, SpoolAsset>();
+		Spool.initialize();
+		assetMap = new HashMap<Long, Asset>();
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
@@ -103,7 +102,7 @@ public class AssetManager {
 
 	// determines if the asset is reference counted and if the number of references
 	// has reached zero.
-	public static boolean checkUnstoreAsset(SpoolAsset asset) {
+	public static boolean checkUnstoreAsset(Asset asset) {
 		if (asset.isReferencedCounted() && asset.getReferenceCount() <= 0) {
 			assetMap.remove(asset.getAssetID());
 			return true;
@@ -175,7 +174,7 @@ public class AssetManager {
 		//Spool.addMultithreadProcess(save);
 	}
 	
-	public static void unload(SpoolAsset asset) {
+	public static void unload(Asset asset) {
 		if (asset == null) {
 			System.err.println("[assets]: Warning! attempted to unload a null asset!");
 		} else {
@@ -195,7 +194,7 @@ public class AssetManager {
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
-		for (SpoolAsset asset : assetMap.values()) {
+		for (Asset asset : assetMap.values()) {
 			unload(asset);
 		}
 	}

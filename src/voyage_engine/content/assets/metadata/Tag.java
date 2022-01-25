@@ -1,8 +1,7 @@
-package voyage_engine.content.metadata;
+package voyage_engine.content.assets.metadata;
+import voyage_engine.content.assets.Asset;
 
-import spool.SpoolAsset;
-
-public class Tag extends SpoolAsset {
+public class Tag extends Asset {
     private int ID;
     private String name;
     private Tag parent;
