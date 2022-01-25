@@ -42,6 +42,8 @@ public class Settings implements IJsonSource {
 	// debug settings.
 	@Expose
 	boolean debugInfoVisible = false;
+	@Expose
+	boolean debugLogs = false;
 	
 	public boolean shouldLimitFPS() {
 		return limitFPS;
@@ -55,7 +57,6 @@ public class Settings implements IJsonSource {
 		return width_scale;
 	}
 
-	
 	public float getHeightScale() {
 		return height_scale;
 	}

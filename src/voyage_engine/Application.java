@@ -98,6 +98,11 @@ public class Application {
 
 	protected void init() {
 		settings = AssetManager.<Settings>loadFromJson("custom_settings.json", Settings.class, false);
+		// setup logging if enabled.
+		if (settings.debugLogs) {
+			// create new print stream for console out.
+			//System.setOut(newOut);
+		}
 		window.create();
 		OpenGL.init();
 		Input.init(window.getAddress());
@@ -144,6 +149,7 @@ public class Application {
 	protected void dispose() {
 		AssetManager.cleanup();
 		window.close();
+		settings.save();
 	}
 	
 	public static Settings getSettings() {
