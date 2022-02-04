@@ -20,7 +20,9 @@ public class AssetManager {
 	private static Manifest manifest;
 	private static HashMap<Long, Asset> assetMap;
 
-	public static void init(boolean rebaseManifest) {
+	private static boolean forceUnload = false;
+
+	public static void initialize(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
 		Spool.initialize();
 		assetMap = new HashMap<Long, Asset>();
@@ -49,6 +51,10 @@ public class AssetManager {
 				data.process();
 			}
 		}
+	}
+
+	public static String getFilePath(String filename) {
+		return manifest.getPath(filename);
 	}
 
 	// returns the requested texture by filename if it can be found in the content
@@ -87,7 +93,7 @@ public class AssetManager {
 	}
 
 	// returns the requested shader file
-	public static voyage_engine.content.assets.shader.Shader getShader(String filename) {
+	public static Shader getShader(String filename) {
 		long id = manifest.getID(filename);
 		Shader shader = (Shader) assetMap.get(id);
 		if (shader == null) {
@@ -98,16 +104,6 @@ public class AssetManager {
 		}
 		shader.updateReferenceCount(1);
 		return shader;
-	}
-
-	// determines if the asset is reference counted and if the number of references
-	// has reached zero.
-	public static boolean checkUnstoreAsset(Asset asset) {
-		if (asset.isReferencedCounted() && asset.getReferenceCount() <= 0) {
-			assetMap.remove(asset.getAssetID());
-			return true;
-		}
-		return false;
 	}
 
 	public static void writeToJson(IJsonSource content, String filepath, boolean writeAll) {
@@ -168,11 +164,6 @@ public class AssetManager {
 		}
 		return content;
 	}
-
-	public static void preformSave() {
-		//Save save = new Save();
-		//Spool.addMultithreadProcess(save);
-	}
 	
 	public static void unload(Asset asset) {
 		if (asset == null) {
@@ -180,7 +171,7 @@ public class AssetManager {
 		} else {
 			asset.updateReferenceCount(-1);
 			// if the reference count has hit zero than remove the asset.
-			if(asset.getReferenceCount() < 0) {
+			if(asset.getReferenceCount() < 0 || forceUnload) {
 				assetMap.remove(asset.getAssetID());
 				if(asset instanceof IGPUAsset) {
 					((IGPUAsset) asset).remove();
@@ -193,13 +184,12 @@ public class AssetManager {
 		System.out.println("[assets]: cleaning up...");
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
+		forceUnload = true;
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
 		for (Asset asset : assetMap.values()) {
 			unload(asset);
 		}
 	}
 
-	public static String getFilePath(String filename) {
-		return manifest.getPath(filename);
-	}
+
 }

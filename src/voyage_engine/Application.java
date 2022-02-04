@@ -106,7 +106,7 @@ public class Application {
 		window.create();
 		OpenGL.init();
 		Input.init(window.getAddress());
-		AssetManager.init(false);
+		AssetManager.initialize(false);
 		// print version information
 		String maxMemory = (Runtime.getRuntime().maxMemory() == Long.MAX_VALUE) ? "no limit" : ((Runtime.getRuntime().maxMemory() / (1024 * 1024)) + "MB");
 		System.out.println("[client]: os: " + System.getProperty("os.name"));
