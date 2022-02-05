@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,12 +21,13 @@ public class AssetManager {
 	private static Manifest manifest;
 	private static HashMap<Long, Asset> assetMap;
 
-	private static boolean forceUnload = false;
+	private static LinkedList<Long> unloadIDList;
 
 	public static void initialize(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
 		Spool.initialize();
 		assetMap = new HashMap<Long, Asset>();
+		unloadIDList = new LinkedList<Long>();
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
@@ -51,6 +53,7 @@ public class AssetManager {
 				data.process();
 			}
 		}
+		unloadUnreferencedAssets();
 	}
 
 	public static String getFilePath(String filename) {
@@ -171,8 +174,10 @@ public class AssetManager {
 		} else {
 			asset.updateReferenceCount(-1);
 			// if the reference count has hit zero than remove the asset.
-			if(asset.getReferenceCount() < 0 || forceUnload) {
-				assetMap.remove(asset.getAssetID());
+			if(asset.getReferenceCount() <= 0) {
+				String assetType = asset.getClass().getSimpleName();
+				System.out.println("[assets]: marked " + assetType  +" for unload: " + asset.getFilename() + ", id: " + asset.getAssetID());
+				unloadIDList.add(asset.getAssetID());
 				if(asset instanceof IGPUAsset) {
 					((IGPUAsset) asset).remove();
 				}
@@ -184,12 +189,18 @@ public class AssetManager {
 		System.out.println("[assets]: cleaning up...");
 		Spool.stop();
 		// forces all the assets to unload from the gpu.
-		forceUnload = true;
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
 		for (Asset asset : assetMap.values()) {
 			unload(asset);
 		}
+		unloadUnreferencedAssets();
 	}
 
+	private static void unloadUnreferencedAssets() {
+		// delete all the id's in the unload list.
+		for(Long id : unloadIDList)
+			assetMap.remove(id);
+		unloadIDList.clear();
+	}
 
 }
