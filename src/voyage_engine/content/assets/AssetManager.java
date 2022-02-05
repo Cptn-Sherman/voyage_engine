@@ -21,13 +21,13 @@ public class AssetManager {
 	private static Manifest manifest;
 	private static HashMap<Long, Asset> assetMap;
 
-	private static LinkedList<Long> unloadIDList;
+	private static LinkedList<Long> unloadIdList;
 
 	public static void initialize(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
 		Spool.initialize();
 		assetMap = new HashMap<Long, Asset>();
-		unloadIDList = new LinkedList<Long>();
+		unloadIdList = new LinkedList<Long>();
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
@@ -35,7 +35,8 @@ public class AssetManager {
 			// if the manifest file was not loaded a new one will be compiled and saved to
 			// the disk.
 		}
-		// if the manifest failed to load or if rebase is set to true a new manifest must be generated.
+		// if the manifest failed to load or if rebase is set to true a new manifest
+		// must be generated.
 		if (manifest == null) {
 			System.out.println("[manifest]: generating new manifest...");
 			manifest = new Manifest();
@@ -167,18 +168,19 @@ public class AssetManager {
 		}
 		return content;
 	}
-	
+
 	public static void unload(Asset asset) {
 		if (asset == null) {
 			System.err.println("[assets]: Warning! attempted to unload a null asset!");
 		} else {
 			asset.updateReferenceCount(-1);
 			// if the reference count has hit zero than remove the asset.
-			if(asset.getReferenceCount() <= 0) {
+			if (asset.getReferenceCount() <= 0) {
 				String assetType = asset.getClass().getSimpleName();
-				System.out.println("[assets]: marked " + assetType  +" for unload: " + asset.getFilename() + ", id: " + asset.getAssetID());
-				unloadIDList.add(asset.getAssetID());
-				if(asset instanceof IGPUAsset) {
+				System.out.println("[assets]: marked " + assetType + " for unload: " + asset.getFilename() + ", id: "
+						+ asset.getAssetID());
+				unloadIdList.add(asset.getAssetID());
+				if (asset instanceof IGPUAsset) {
 					((IGPUAsset) asset).remove();
 				}
 			}
@@ -187,7 +189,7 @@ public class AssetManager {
 
 	public static void cleanup() {
 		System.out.println("[assets]: cleaning up...");
-		Spool.stop();
+		Spool.stopThreads();
 		// forces all the assets to unload from the gpu.
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
 		for (Asset asset : assetMap.values()) {
@@ -198,9 +200,9 @@ public class AssetManager {
 
 	private static void unloadUnreferencedAssets() {
 		// delete all the id's in the unload list.
-		for(Long id : unloadIDList)
+		for (Long id : unloadIdList) {
 			assetMap.remove(id);
-		unloadIDList.clear();
+		}
+		unloadIdList.clear();
 	}
-
 }
