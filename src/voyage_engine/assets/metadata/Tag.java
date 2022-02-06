@@ -1,5 +1,5 @@
-package voyage_engine.content.assets.metadata;
-import voyage_engine.content.assets.Asset;
+package voyage_engine.assets.metadata;
+import voyage_engine.assets.Asset;
 
 public class Tag extends Asset {
     private int ID;

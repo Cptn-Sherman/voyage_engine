@@ -3,7 +3,7 @@ package voyage_engine;
 import com.google.gson.annotations.Expose;
 
 import spool.IJsonSource;
-import voyage_engine.content.assets.AssetManager;
+import voyage_engine.assets.AssetManager;
 
 public class Settings implements IJsonSource {
 	@Expose

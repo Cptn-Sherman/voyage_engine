@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.font;
+package voyage_engine.assets.font;
 
 import static org.lwjgl.opengl.GL11.GL_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
@@ -17,7 +17,6 @@ import static org.lwjgl.stb.STBTruetype.stbtt_PackBegin;
 import static org.lwjgl.stb.STBTruetype.stbtt_PackEnd;
 import static org.lwjgl.stb.STBTruetype.stbtt_PackFontRange;
 import static org.lwjgl.stb.STBTruetype.stbtt_PackSetOversampling;
-import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import static org.lwjgl.system.MemoryUtil.memFree;
@@ -25,23 +24,20 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTTPackContext;
 import org.lwjgl.stb.STBTTPackedchar;
-import org.lwjgl.system.MemoryStack;
 
 import spool.IInstantLoad;
 import voyage_engine.Application;
-import voyage_engine.content.assets.Asset;
-import voyage_engine.content.assets.AssetManager;
-import voyage_engine.content.assets.IGPUAsset;
-import voyage_engine.content.assets.mesh.Mesh;
-import voyage_engine.content.assets.mesh.MeshData;
-import voyage_engine.content.assets.texture.Texture;
+import voyage_engine.assets.Asset;
+import voyage_engine.assets.IGPUAsset;
+import voyage_engine.assets.mesh.Mesh;
+import voyage_engine.assets.mesh.MeshData;
+import voyage_engine.assets.texture.Texture;
 import voyage_engine.util.IOUtil;
 import voyage_engine.util.Vec2;
 
@@ -91,7 +87,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		}
 
 		texture.setTextureID(glGenTextures());
-
+		texture.setFilename(getFilename() + "#GENERATED_ATLAS");
 		try (STBTTPackContext pc = STBTTPackContext.malloc()) {
 			// byteBuffer containing the ttf file content.
 			ByteBuffer ttf = IOUtil.ioResourceToByteBuffer("data\\" + filename, 512 * 1024);
@@ -120,7 +116,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 			}
 			// unbind the texture.
 			glBindTexture(GL_TEXTURE_2D, 0);
-			System.out.println("[asset]: generated font texture for: " + filename);
+			System.out.println("[asset]: generated font texture: " + filename);
 		} catch (IOException e) {
 			System.out.println("[asset]: ERROR something went wrong loading the font: " + filename);
 			throw new RuntimeException(e);
@@ -272,7 +268,8 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		quad.free();
 		chardata.free();
 		font_info.free();
-		AssetManager.release(texture);
+		// This is only used because this asset maintains its own texture.
+		texture.remove();
 	}
 
 	private boolean isFilenameValid(String filename) {

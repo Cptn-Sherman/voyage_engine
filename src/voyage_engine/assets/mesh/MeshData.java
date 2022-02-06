@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.mesh;
+package voyage_engine.assets.mesh;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package voyage_engine.content.assets;
+package voyage_engine.assets;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -27,7 +27,7 @@ public class Manifest implements IJsonSource {
 			}
 		};
 		String relativePath = new File("data\\").getAbsolutePath().toString();
-		System.out.println("[manifest]: relative path: " + relativePath);
+		System.out.println("[manifest]: data folder path: " + relativePath);
 		File[] folders = new File("data\\").listFiles(directoryFilter);
 		System.out.println("[manifest]: printing...");
 		boolean folderFound = false;

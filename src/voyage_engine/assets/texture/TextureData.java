@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.texture;
+package voyage_engine.assets.texture;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;

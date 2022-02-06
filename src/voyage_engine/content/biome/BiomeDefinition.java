@@ -1,6 +1,6 @@
 package voyage_engine.content.biome;
 
-import voyage_engine.content.assets.metadata.TaggableContent;
+import voyage_engine.assets.metadata.TaggableContent;
 
 public class BiomeDefinition extends TaggableContent {
     

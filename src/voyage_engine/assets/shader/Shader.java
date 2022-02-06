@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.shader;
+package voyage_engine.assets.shader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 import com.google.gson.annotations.Expose;
 
-import voyage_engine.content.assets.Asset;
-import voyage_engine.content.assets.AssetManager;
-import voyage_engine.content.assets.IGPUAsset;
 import spool.IInstantLoad;
 import spool.IJsonSource;
+import voyage_engine.assets.Asset;
+import voyage_engine.assets.AssetManager;
+import voyage_engine.assets.IGPUAsset;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;

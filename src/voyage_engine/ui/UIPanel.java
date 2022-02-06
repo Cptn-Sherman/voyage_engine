@@ -1,9 +1,10 @@
 package voyage_engine.ui;
 
-import voyage_engine.content.assets.AssetManager;
-import voyage_engine.content.assets.mesh.Mesh;
-import voyage_engine.content.assets.mesh.MeshUtil;
-import voyage_engine.content.assets.shader.Shader;
+import voyage_engine.assets.AssetCache;
+import voyage_engine.assets.AssetManager;
+import voyage_engine.assets.mesh.Mesh;
+import voyage_engine.assets.mesh.MeshUtil;
+import voyage_engine.assets.shader.Shader;
 import voyage_engine.graphics.Color;
 import voyage_engine.graphics.IRenderable;
 import voyage_engine.graphics.OpenGL;
@@ -18,18 +19,18 @@ public class UIPanel extends UIComponent implements IRenderable {
     private Mesh mesh;
     private Shader shader;
 
-    public UIPanel (float rx, float ry, int width, int height) {
-        this(rx, ry, width, height, UIAnchor.MIDDLE_CENTER);
+    public UIPanel (AssetCache cache, float rx, float ry, int width, int height) {
+        this(cache, rx, ry, width, height, UIAnchor.MIDDLE_CENTER);
     }
 
-    public UIPanel(float x, float y, int width, int height, UIAnchor anchor) {
+    public UIPanel(AssetCache cache, float x, float y, int width, int height, UIAnchor anchor) {
         setAnchor(anchor);
         setPosition(x, y);
         setDimensions(width, height);
         screenPos = new Vec2();
         scaleFactor = DEFAULT_SCALE_FACTOR;
         // request and generate required assets.
-        shader = AssetManager.getShader("color_shader");
+        shader = AssetManager.getShader(cache, "color_shader");
         mesh = MeshUtil.generateQuad(width, height);
     }
 

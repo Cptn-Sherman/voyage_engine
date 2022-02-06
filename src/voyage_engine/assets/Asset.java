@@ -1,4 +1,4 @@
-package voyage_engine.content.assets;
+package voyage_engine.assets;
 
 public abstract class Asset {
 	private long assetID;
@@ -44,5 +44,9 @@ public abstract class Asset {
 
 	public void setReady(boolean ready) {
 		this.isReady = ready;
+	}
+
+	public String toString() {
+		return "[id: 0x" + String.format("%016x", assetID).toUpperCase() + ", type: " + this.getClass().getSimpleName().toUpperCase() + ", references " + getReferenceCount() + ", filename: \"" + getFilename() + "\"]";
 	}
 }

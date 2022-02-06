@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.mesh;
+package voyage_engine.assets.mesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,16 +6,15 @@ import java.util.List;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
-import voyage_engine.content.assets.Asset;
-import voyage_engine.content.assets.IGPUAsset;
 import spool.IMultithreadLoad;
+import voyage_engine.assets.Asset;
+import voyage_engine.assets.IGPUAsset;
 
 public class Mesh extends Asset implements IMultithreadLoad, IGPUAsset {
 	int vao;
     List<Integer> vbo_list = new ArrayList<Integer>();
     int vertex_count;
     int attrib_count;
-    String filename;
 
     public Mesh() {
 		super(true);

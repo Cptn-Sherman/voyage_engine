@@ -5,13 +5,12 @@ import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import org.lwjgl.Version;
 import org.lwjgl.opengl.GL11;
 
-import voyage_engine.content.assets.AssetManager;
+import voyage_engine.assets.AssetManager;
 import voyage_engine.graphics.OpenGL;
 import voyage_engine.graphics.Window;
 import voyage_engine.input.Input;
 import voyage_engine.input.Input.Key;
 import voyage_engine.state.State;
-
 
 public class Application {
 	private static boolean running = true;
@@ -32,10 +31,9 @@ public class Application {
 		// timing variables.
 		final double nsPerTick = 1000000000.0D / 60.0D;
 		double timer = System.currentTimeMillis();
-		double unprocessed = 0;
 		double currentTick = System.nanoTime();
 		double lastTick = System.nanoTime();
-		
+		double unprocessed = 0;
 		boolean shouldRender;
 		long now, last = System.nanoTime();
 
@@ -110,8 +108,6 @@ public class Application {
 		// print version information
 		max_memory = (Runtime.getRuntime().maxMemory() / (1024 * 1024));
 		String maxMemoryStr = (max_memory == Long.MAX_VALUE) ? "no limit" : (max_memory + "MB");
-		System.out.println("[client]: os: " + System.getProperty("os.name"));
-		System.out.println("[client]: arch: " + System.getProperty("os.arch"));
 		System.out.println("[client]: java: " + System.getProperty("java.version"));		
 		System.out.println("[client]: openGL: " + GL11.glGetString(GL11.GL_VERSION));
 		System.out.println("[client]: lwjgl: " + Version.getVersion());
@@ -143,13 +139,17 @@ public class Application {
 		used_memory_percentage *= 100;
 		used_memory_percentage = Math.round(used_memory_percentage);
 		// print fps, tps, and memory usage.
-		System.out.println(frame_count + " frames, " + tick_count + " ticks, " + "[" + used_memory_percentage + "%] used: " + byteToMegabyte(used_memory) + "MB , allocated: " + byteToMegabyte(total_memory) + "MB, of max: " + byteToMegabyte(max_memory) + "MB");
+		System.out.println(frame_count + " frames, " + tick_count + " ticks, " + "[" + used_memory_percentage + "%] used: " + byteToMegabyte(used_memory) + "MB, allocated: " + byteToMegabyte(total_memory) + "MB");
 	}
 	
 	protected void dispose() {
+		if (currentState != null) {
+			currentState.dispose();
+		}
 		AssetManager.cleanup();
 		window.close();
 		settings.save();
+		System.exit(0);
 	}
 	
 	public static Settings getSettings() {
@@ -189,7 +189,7 @@ public class Application {
 	}
 
     public static void setState(State state) {
-		System.out.println("[voyage]: setting state: " + state.getName());
+		System.out.println("[client]: setting state: " + state.getName());
 		// releasing the cached assets now that a new state has been set.
 		if (currentState != null) {
 			currentState.dispose();

@@ -1,10 +1,11 @@
 package voyage_engine.ui;
 
 import voyage_engine.Application;
-import voyage_engine.content.assets.AssetManager;
-import voyage_engine.content.assets.font.Font;
-import voyage_engine.content.assets.mesh.Mesh;
-import voyage_engine.content.assets.shader.Shader;
+import voyage_engine.assets.AssetCache;
+import voyage_engine.assets.AssetManager;
+import voyage_engine.assets.font.Font;
+import voyage_engine.assets.mesh.Mesh;
+import voyage_engine.assets.shader.Shader;
 import voyage_engine.graphics.Color;
 import voyage_engine.graphics.IRenderable;
 import voyage_engine.graphics.OpenGL;
@@ -19,14 +20,14 @@ public class UILabel extends UIComponent implements IRenderable {
 	Color color;
 	Mesh mesh;
 	
-	public UILabel(String t, int s) {
-		this(t, s, Color.WHITE, 0, 0, UIAnchor.BOTTOM_LEFT);
+	public UILabel(AssetCache cache, String t, int s) {
+		this(cache, t, s, Color.WHITE, 0, 0, UIAnchor.BOTTOM_LEFT);
 	}
 	
-	public UILabel(String t, int s, Color c, int x, int y, UIAnchor anchor) {
+	public UILabel(AssetCache cache, String t, int s, Color c, int x, int y, UIAnchor anchor) {
 		super(x, y, 0, 0, anchor);
-		shader = AssetManager.getShader("text_shader");
-		font = AssetManager.getFont("Montserrat-Bold", 2, true);
+		shader = AssetManager.getShader(cache, "text_shader");
+		font = AssetManager.getFont(cache, "Montserrat-Bold", 2, true);
 		text = new String();
 		size = s;
 		mesh = new Mesh();

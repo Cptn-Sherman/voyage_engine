@@ -1,4 +1,4 @@
-package voyage_engine.content.assets;
+package voyage_engine.assets;
 
 import java.util.LinkedList;
 

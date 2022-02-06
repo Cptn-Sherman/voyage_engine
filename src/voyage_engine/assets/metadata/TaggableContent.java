@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.metadata;
+package voyage_engine.assets.metadata;
 
 import java.util.ArrayList;
 import java.util.List;

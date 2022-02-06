@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.screenshot;
+package voyage_engine.assets.screenshot;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

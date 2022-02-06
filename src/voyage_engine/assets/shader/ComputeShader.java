@@ -1,8 +1,8 @@
-package voyage_engine.content.assets.shader;
-import voyage_engine.content.assets.Asset;
-import voyage_engine.content.assets.IGPUAsset;
+package voyage_engine.assets.shader;
 import spool.IInstantLoad;
 import spool.IJsonSource;
+import voyage_engine.assets.Asset;
+import voyage_engine.assets.IGPUAsset;
 
 public class ComputeShader extends Asset implements IInstantLoad, IJsonSource, IGPUAsset {
 

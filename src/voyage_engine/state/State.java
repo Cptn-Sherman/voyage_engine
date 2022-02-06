@@ -1,6 +1,6 @@
 package voyage_engine.state;
 
-import voyage_engine.content.assets.AssetCache;
+import voyage_engine.assets.AssetCache;
 
 public abstract class State {
 	
@@ -19,6 +19,7 @@ public abstract class State {
     public abstract void render();
     
     public void dispose() {
+        System.out.println("[state]: disposing " + stateName);
         assetCache.freeCache();
     }
 

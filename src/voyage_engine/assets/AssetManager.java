@@ -1,4 +1,4 @@
-package voyage_engine.content.assets;
+package voyage_engine.assets;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -10,12 +10,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 
-import voyage_engine.content.assets.font.Font;
-import voyage_engine.content.assets.shader.Shader;
-import voyage_engine.content.assets.texture.Texture;
 import spool.IData;
 import spool.IJsonSource;
 import spool.Spool;
+import voyage_engine.assets.font.Font;
+import voyage_engine.assets.shader.Shader;
+import voyage_engine.assets.texture.Texture;
 
 public class AssetManager {
 	private static Manifest manifest;
@@ -79,6 +79,9 @@ public class AssetManager {
 			texture.setAssetID(id);
 			assetMap.put(id, texture);
 			Spool.addMultithreadProcess(texture);
+			System.out.println("[assets]: cache miss: " + texture.toString());
+		} else {
+			System.out.println("[assets]: cache hit: " + texture.toString());
 		}
 		texture.updateReferenceCount(1);
 		return texture;
@@ -86,14 +89,22 @@ public class AssetManager {
 
 	// returns the requested font by filename if it can be found in the content map
 	// or returns a new pointer to the font and loads the font immediately.
-	public static Font getFont(String filename, int oversampling, boolean filter) {
+	public static Font getFont(AssetCache cache, String filename, int oversampling, boolean filter) {
 		Long id = manifest.getID(filename);
+		// if a cache was provided the id will be include in the cache list to free when
+		// cache is no longer needed.
+		if (cache != null) {
+			cache.include(id);
+		}
 		Font font = (Font) assetMap.get(id);
 		if (font == null) {
 			font = new Font(manifest.getPath(filename), oversampling, filter);
 			font.setAssetID(id);
 			font.load();
 			assetMap.put(id, font);
+			System.out.println("[assets]: cache miss: " + font.toString());
+		} else {
+			System.out.println("[assets]: cache hit: " + font.toString());
 		}
 		// this update reference also updates the reference count for the texture which
 		// is attached.
@@ -102,21 +113,31 @@ public class AssetManager {
 	}
 
 	// returns the requested shader file
-	public static Shader getShader(String filename) {
+	public static Shader getShader(AssetCache cache, String filename) {
 		long id = manifest.getID(filename);
+		// if a cache was provided the id will be include in the cache list to free when
+		// cache is no longer needed.
+		if (cache != null) {
+			cache.include(id);
+		}
 		Shader shader = (Shader) assetMap.get(id);
 		if (shader == null) {
-			shader = loadFromJson(manifest.getPath(filename), Shader.class, false);
+			String filepath = manifest.getPath(filename);
+			shader = loadFromJson(filepath, Shader.class, false);
+			shader.setFilename(filepath);
 			shader.setAssetID(id);
 			shader.load();
 			assetMap.put(id, shader);
+			System.out.println("[assets]: cache miss: " + shader.toString());
+		} else {
+			System.out.println("[assets]: cache hit: " + shader.toString());
 		}
 		shader.updateReferenceCount(1);
 		return shader;
 	}
 
 	public static void writeToJson(IJsonSource content, String filepath, boolean writeAll) {
-		System.out.println("[assets]: writing json data...");
+		System.out.println("[assets]: writing json: " + filepath);
 		Gson gson;
 		if (writeAll) {
 			gson = new GsonBuilder().setPrettyPrinting().create();
@@ -181,10 +202,10 @@ public class AssetManager {
 			asset.updateReferenceCount(-1);
 			// if the reference count has hit zero than remove the asset.
 			if (asset.getReferenceCount() <= 0) {
-				String assetType = asset.getClass().getSimpleName();
-				System.out.println("[assets]: marked " + assetType + " for unload: " + asset.getFilename() + ", id: "
-						+ asset.getAssetID());
-				unloadIdList.add(asset.getAssetID());
+				if(!unloadIdList.contains(asset.getAssetID())) {
+					System.out.println("[assets]: flagged for unload: " + asset.toString());
+					unloadIdList.add(asset.getAssetID());
+				}
 				if (asset instanceof IGPUAsset) {
 					((IGPUAsset) asset).remove();
 				}
