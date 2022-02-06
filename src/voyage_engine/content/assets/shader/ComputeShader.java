@@ -1,4 +1,4 @@
-package voyage_engine.content.assets.compute;
+package voyage_engine.content.assets.shader;
 import voyage_engine.content.assets.Asset;
 import voyage_engine.content.assets.IGPUAsset;
 import spool.IInstantLoad;

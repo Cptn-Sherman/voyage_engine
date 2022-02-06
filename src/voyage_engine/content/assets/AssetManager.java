@@ -54,7 +54,7 @@ public class AssetManager {
 				data.process();
 			}
 		}
-		unloadUnreferencedAssets();
+		releaseUnreferencedAssets();
 	}
 
 	public static String getFilePath(String filename) {
@@ -66,8 +66,13 @@ public class AssetManager {
 	// or returns a new pointer to the texture and attempts to load the content
 	// using
 	// multi-threaded Loading.
-	public static Texture getTexture(String filename, boolean filter, boolean mipmap) {
+	public static Texture getTexture(AssetCache cache, String filename, boolean filter, boolean mipmap) {
 		long id = manifest.getID(filename);
+		// if a cache was provided the id will be include in the cache list to free when
+		// cache is no longer needed.
+		if (cache != null) {
+			cache.include(id);
+		}
 		Texture texture = (Texture) assetMap.get(id);
 		if (texture == null) {
 			texture = new Texture(manifest.getPath(filename), filter, mipmap);
@@ -169,7 +174,7 @@ public class AssetManager {
 		return content;
 	}
 
-	public static void unload(Asset asset) {
+	public static void release(Asset asset) {
 		if (asset == null) {
 			System.err.println("[assets]: Warning! attempted to unload a null asset!");
 		} else {
@@ -187,18 +192,23 @@ public class AssetManager {
 		}
 	}
 
+	public static void release(Long id) {
+		Asset asset = assetMap.get(id);
+		release(asset);
+	}
+
 	public static void cleanup() {
 		System.out.println("[assets]: cleaning up...");
 		Spool.stopThreads();
 		// forces all the assets to unload from the gpu.
 		System.out.println("[assets]: unloading " + assetMap.size() + " stored asset(s)...");
 		for (Asset asset : assetMap.values()) {
-			unload(asset);
+			release(asset);
 		}
-		unloadUnreferencedAssets();
+		releaseUnreferencedAssets();
 	}
 
-	private static void unloadUnreferencedAssets() {
+	private static void releaseUnreferencedAssets() {
 		// delete all the id's in the unload list.
 		for (Long id : unloadIdList) {
 			assetMap.remove(id);

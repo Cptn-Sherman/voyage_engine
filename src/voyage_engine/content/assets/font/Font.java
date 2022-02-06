@@ -272,7 +272,7 @@ public class Font extends Asset implements IInstantLoad, IGPUAsset {
 		quad.free();
 		chardata.free();
 		font_info.free();
-		AssetManager.unload(texture);
+		AssetManager.release(texture);
 	}
 
 	private boolean isFilenameValid(String filename) {

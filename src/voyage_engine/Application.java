@@ -10,7 +10,7 @@ import voyage_engine.graphics.OpenGL;
 import voyage_engine.graphics.Window;
 import voyage_engine.input.Input;
 import voyage_engine.input.Input.Key;
-import voyage_engine.state.IState;
+import voyage_engine.state.State;
 
 
 public class Application {
@@ -18,7 +18,7 @@ public class Application {
 	
 	private static Window window;
 	private static Settings settings;
-	private static IState currentState;
+	private static State currentState;
 	
 	// application performance metrics.
     private static int frame_count, tick_count;
@@ -28,7 +28,7 @@ public class Application {
 	
 	public Application() {
 		window = new Window();
-		init();
+		initialize();
 		// timing variables.
 		final double nsPerTick = 1000000000.0D / 60.0D;
 		double timer = System.currentTimeMillis();
@@ -96,7 +96,7 @@ public class Application {
 			currentState.render();		
 	}
 
-	protected void init() {
+	protected void initialize() {
 		settings = AssetManager.<Settings>loadFromJson("custom_settings.json", Settings.class, false);
 		// setup logging if enabled.
 		if (settings.debugLogs) {
@@ -108,13 +108,14 @@ public class Application {
 		Input.init(window.getAddress());
 		AssetManager.initialize(false);
 		// print version information
-		String maxMemory = (Runtime.getRuntime().maxMemory() == Long.MAX_VALUE) ? "no limit" : ((Runtime.getRuntime().maxMemory() / (1024 * 1024)) + "MB");
+		max_memory = (Runtime.getRuntime().maxMemory() / (1024 * 1024));
+		String maxMemoryStr = (max_memory == Long.MAX_VALUE) ? "no limit" : (max_memory + "MB");
 		System.out.println("[client]: os: " + System.getProperty("os.name"));
 		System.out.println("[client]: arch: " + System.getProperty("os.arch"));
 		System.out.println("[client]: java: " + System.getProperty("java.version"));		
 		System.out.println("[client]: openGL: " + GL11.glGetString(GL11.GL_VERSION));
 		System.out.println("[client]: lwjgl: " + Version.getVersion());
-		System.out.println("[client]: memory: " + maxMemory);
+		System.out.println("[client]: memory: " + maxMemoryStr);
 	}
 	
 	protected void tick(double delta) {
@@ -142,8 +143,7 @@ public class Application {
 		used_memory_percentage *= 100;
 		used_memory_percentage = Math.round(used_memory_percentage);
 		// print fps, tps, and memory usage.
-		System.out.println(frame_count + " frames, " + tick_count + " ticks");
-		System.out.println("[" + used_memory_percentage + "%] used: " + byteToMegabyte(used_memory) + "MB , total: " + byteToMegabyte(total_memory) + "MB");
+		System.out.println(frame_count + " frames, " + tick_count + " ticks, " + "[" + used_memory_percentage + "%] used: " + byteToMegabyte(used_memory) + "MB , allocated: " + byteToMegabyte(total_memory) + "MB, of max: " + byteToMegabyte(max_memory) + "MB");
 	}
 	
 	protected void dispose() {
@@ -187,4 +187,13 @@ public class Application {
 	private static long byteToMegabyte(long val) {
 		return val / (1024 * 1024);
 	}
+
+    public static void setState(State state) {
+		System.out.println("[voyage]: setting state: " + state.getName());
+		// releasing the cached assets now that a new state has been set.
+		if (currentState != null) {
+			currentState.dispose();
+		}
+		currentState = state;
+    }
 }
