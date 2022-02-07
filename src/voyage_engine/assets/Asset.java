@@ -1,7 +1,7 @@
 package voyage_engine.assets;
 
 public abstract class Asset {
-	private long assetID;
+	private int assetID;
 	private boolean referenceCounted;
 	private int references;
 	protected boolean isReady;
@@ -24,11 +24,11 @@ public abstract class Asset {
 		references += val;
 	}
 
-	public long getAssetID() {
+	public int getAssetID() {
 		return assetID;
 	}
 
-	public void setAssetID(long id) {
+	public void setAssetID(int id) {
 		assetID = id;
 	}
 
@@ -47,6 +47,6 @@ public abstract class Asset {
 	}
 
 	public String toString() {
-		return "[id: 0x" + String.format("%016x", assetID).toUpperCase() + ", type: " + this.getClass().getSimpleName().toUpperCase() + ", references " + getReferenceCount() + ", filename: \"" + getFilename() + "\"]";
+		return "[id: 0x" + String.format("%08x", assetID).toUpperCase() + ", type: " + this.getClass().getSimpleName().toUpperCase() + ", references " + getReferenceCount() + ", filename: \"" + getFilename() + "\"]";
 	}
 }

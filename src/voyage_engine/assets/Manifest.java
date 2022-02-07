@@ -8,15 +8,16 @@ import spool.IJsonSource;
 
 public class Manifest implements IJsonSource {
 	private HashMap<String, String> filenameToPath;
-	private HashMap<String, Long> filenameToID;
-	private HashMap<String, Long> folderToLastID;
-	private long highestID;
+	private HashMap<String, Integer> filenameToId;
+	private HashMap<String, Integer> packageToLastId;
+	private HashMap<String, Short> packagenameToId;
+	private int highestID;
 
 	public Manifest() {
 		filenameToPath = new HashMap<String, String>();
-		filenameToID = new HashMap<String, Long>();
-		folderToLastID = new HashMap<String, Long>();
-		highestID = 0L;
+		filenameToId = new HashMap<String, Integer>();
+		packageToLastId = new HashMap<String, Integer>();
+		highestID = 0;
 	}
 
 	public void compile() {
@@ -29,14 +30,14 @@ public class Manifest implements IJsonSource {
 		String relativePath = new File("data\\").getAbsolutePath().toString();
 		System.out.println("[manifest]: data folder path: " + relativePath);
 		File[] folders = new File("data\\").listFiles(directoryFilter);
-		System.out.println("[manifest]: printing...");
+		System.out.println("[manifest]: printing data...");
 		boolean folderFound = false;
-		long lastID = 0L;
+		int lastID = 0;
 		for (File folder : folders) {
 			// check to see if a last ID was recorded for this folder name.
-			Long folderLastID = folderToLastID.get(folder.toString());
+			Integer folderLastID = packageToLastId.get(folder.toString());
 			if (folderLastID != null) {
-				lastID = folderLastID.longValue();
+				lastID = folderLastID.intValue();
 				folderFound = true;
 				System.out.println("[manifest]: using last ID: " + lastID);
 			} else {
@@ -44,10 +45,11 @@ public class Manifest implements IJsonSource {
 			}
 
 			System.out.println(folder);
+
 			lastID = searchDirectory(folder, relativePath, lastID);
 			
 			// record the new lastID for the specific folder.
-			folderToLastID.put(folder.toString(), lastID);
+			packageToLastId.put(folder.toString(), lastID);
 			
 			// increment the lastID up to next increment of 32767.
 			if(folderFound == false) {
@@ -67,8 +69,8 @@ public class Manifest implements IJsonSource {
 		AssetManager.writeToJson(this, "data\\manifest.json", true);
 	}
 
-	public long getID(String filename) {
-		return filenameToID.get(filename);
+	public int getID(String filename) {
+		return filenameToId.get(filename);
 	}
 
 	public String getPath(String filename) {
@@ -79,16 +81,16 @@ public class Manifest implements IJsonSource {
 		return path.substring(path.lastIndexOf('\\') + 1, path.lastIndexOf('.'));
 	}
 
-	private long searchDirectory(File folder, String relativePath, long lastID) {
+	private int searchDirectory(File folder, String relativePath, int lastID) {
 		File[] files = folder.listFiles();
 		for (File f : files) {
 			if (f.isDirectory()) {
 				lastID = searchDirectory(f, relativePath, lastID);
 			} else {
 				String filename = formatFilename(f.toString());
-				if (!(filenameToPath.containsKey(filename) && filenameToID.containsKey(filename))) {
+				if (!(filenameToPath.containsKey(filename) && filenameToId.containsKey(filename))) {
 					filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
-					filenameToID.put(filename, lastID);
+					filenameToId.put(filename, lastID);
 					lastID++;
 					System.out.println("\tadding:  " + filename);
 				} else {

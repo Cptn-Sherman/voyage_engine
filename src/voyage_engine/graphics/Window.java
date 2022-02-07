@@ -65,7 +65,7 @@ public class Window {
 		width = Application.getSettings().getWidth();
 		height = Application.getSettings().getHeight();
 		window_address = glfwCreateWindow(width, height, "Remnants", NULL, NULL);
-		System.out.println("[client]: creating display [" + width + "x" + height + "]...");
+		System.out.println("[client]: creating window [" + width + "x" + height + "]...");
 
 		// check that the window was created successfully.
 		if (window_address == NULL) {

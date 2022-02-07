@@ -3,9 +3,10 @@ package voyage_engine.state;
 import voyage_engine.assets.AssetCache;
 
 public abstract class State {
+    
+    private String stateName;
 	
     protected AssetCache assetCache;
-    private String stateName;
 
     protected State() {
         assetCache = new AssetCache();
@@ -19,7 +20,7 @@ public abstract class State {
     public abstract void render();
     
     public void dispose() {
-        System.out.println("[state]: disposing " + stateName);
+        System.out.println("[state]: disposing [" + stateName + "] assets...");
         assetCache.freeCache();
     }
 
