@@ -1,3 +1,6 @@
+
+
+
 # **PLANNED FEATURES**
 
 ---
@@ -10,7 +13,6 @@
 - [X] Slow tick
 - [X] Cleanup on close
 #### **Bugs:**
-- [ ] `System.properties("os.arch");` is returning the wrong value, should be x86 64 not amd64.
 #### **Notes:**
 - The engines application class is extended by remnants game class.
 - Engine takes the opportunity to finish loading content when a frame does not need to be rendered.
@@ -78,6 +80,7 @@
 ### **ASSET & CONTENT MANAGEMENT:**
 - [X] Manifest
 - [X] Multithreaded asset loading
+- [X] Asset Cache used per State instance
 - [X] Asset Manager
 - [ ] Content Manager
 - [X] Asset & Content reference id's.
@@ -87,6 +90,7 @@
 - [ ] Hot load .class which extend Asset & Content classes.
 - [ ] Screenshots folder in "data" needs to be ignored by the manifest.
 #### **Bugs:**
+- [ ] `Surprise.jpg` is loaded by asset manager and the reference is higher than expected. (Was 3 expected 2). This results in asset staying loaded when it should not be.
 - [ ] manifest.json highestID contains the wrong value. Should not be lower than any values in folderToLastID.
 ```json
   "folderToLastID": {
@@ -99,6 +103,7 @@
 - Pools of threads distribute tasks evenly.
 - Asset and content managers can load and unload when there are not instance of the asset in use.
 - Each Mod pack is allowed ~32,768 asset or content id's to use. When added to the users game each item is added to the master manifest file. If a mod is updated with new assets or content it is appended using the last used id for that mod pack.
+- Each Mod is assigned a 16-bit value bit shifted to the upper half of an asset id's 32-bit value. 
 - GSON is used to write and read json files. 
 
 ---
@@ -107,11 +112,12 @@
 - [ ] Instructions to pack a user jar with data folder included.
 - [ ] Load external jars.
 - [ ] Update added mod.
-- [ ] Users can attempt to force load a mod jar.
+- [ ] Users can attempt to force load a mod jar with missmatched versions.
 - [ ] Load new mod jars at runtime.
+- [ ] Load unpacked java project for development of mods.
 #### **Bugs:**
 #### **Notes:**
-- note.
+- 
 
 ---
 
@@ -132,7 +138,7 @@
   
 ---
 
-### **PLATE TECTONIC CONTROLS:**
+### **WORLD MAP CONTROLS:**
 - [ ] Zoom 
 - [ ] Pan
 - [ ] Infinite map panning 
@@ -252,6 +258,7 @@
 - [ ] Animated waves
 - [ ] Wind based wave direction
 - [ ] Underwater rendering
+- [ ] Water currents
 #### **Bugs:**
 #### **Notes:**
 
@@ -261,7 +268,7 @@
 - [ ] Collisions
 - [ ] Projectiles
 #### **Bugs:**
-- [ ]
+- [ ] 
 #### **Notes:**
 
 ---
@@ -308,6 +315,19 @@
 - [ ] Implement console to log file. [Tutorial Link](https://www.dev2qa.com/how-to-write-console-output-to-text-file-in-java/#:~:text=How%20To%20Write%20Console%20Output%20To%20Text%20File,Console%20Output%20To%20Text%20File%20In%20Java%20Examples.)
 #### **Bugs:**
 #### **Notes:**
+
+---
+
+### **LAUNCHER:**
+- [ ] Download specific version of the game
+- [ ] Download the latest version of the game
+- [ ] Launch game by version
+- [ ] Manage game install with jvm arguments
+- [ ] Handle login player account
+- [ ] Upload error logs on game crash
+#### **Bugs:**
+#### **Notes:**
+-  
 
 ---
 

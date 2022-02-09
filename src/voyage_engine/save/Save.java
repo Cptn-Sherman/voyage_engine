@@ -1,4 +1,4 @@
-package voyage_engine.assets.save;
+package voyage_engine.save;
 
 import java.io.File;
 
