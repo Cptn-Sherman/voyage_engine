@@ -18,6 +18,8 @@ import voyage_engine.assets.shader.Shader;
 import voyage_engine.assets.texture.Texture;
 
 public class AssetManager {
+	private static final String MODULE_FOLDER_PATH = "data\\";
+
 	private static Manifest manifest;
 	private static HashMap<Integer, Asset> assetMap;
 
@@ -31,15 +33,13 @@ public class AssetManager {
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
-			manifest = loadFromJsonAllowFailure("data\\manifest.json", Manifest.class, true);
-			// if the manifest file was not loaded a new one will be compiled and saved to
-			// the disk.
+			manifest = loadFromJsonAllowFailure(MODULE_FOLDER_PATH + "manifest.json", Manifest.class, true);
 		}
 		// if the manifest failed to load or if rebase is set to true a new manifest
 		// must be generated.
 		if (manifest == null) {
 			System.out.println("[manifest]: generating new manifest...");
-			manifest = new Manifest();
+			manifest = new Manifest(MODULE_FOLDER_PATH);
 		}
 		// compile the manifest, checking for new assets or changes.
 		manifest.compile();

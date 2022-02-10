@@ -1,0 +1,15 @@
+{
+  "limitFPS": true,
+  "width": 1920,
+  "height": 1080,
+  "fullscreen": false,
+  "chunkLoadDistance": 16,
+  "musicFrequency": 0.5,
+  "masterVolume": 1.0,
+  "sfxVolume": 1.0,
+  "musicVolume": 1.0,
+  "ambientVolume": 1.0,
+  "mouseSensitivity": 0.05,
+  "debugInfoVisible": false,
+  "debugLogs": false
+}

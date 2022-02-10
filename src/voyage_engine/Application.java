@@ -25,6 +25,10 @@ public class Application {
 	private static long free_memory, used_memory, total_memory, max_memory;
 	private static float used_memory_percentage;
 	
+	public static void main(String[] args) {
+		new Application();
+	}
+
 	public Application() {
 		window = new Window();
 		initialize();
@@ -102,8 +106,8 @@ public class Application {
 			//System.setOut(newOut);
 		}
 		window.create();
-		OpenGL.init();
-		Input.init(window.getAddress());
+		OpenGL.initialize();
+		Input.initialize(window.getAddress());
 		AssetManager.initialize(false);
 		// print version information
 		max_memory = (Runtime.getRuntime().maxMemory() / (1024 * 1024));

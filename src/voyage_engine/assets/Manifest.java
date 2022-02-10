@@ -13,11 +13,15 @@ public class Manifest implements IJsonSource {
 	private HashMap<Short, Module> packageToLastId;
 	private short highestID;
 
-	public Manifest() {
+	private String moduleFolderPath;
+
+	public Manifest(String module_folder_path) {
 		filenameToPath 		= new HashMap<String, String>();
 		filenameToId 		= new HashMap<String, Integer>();
 		packageToLastId 	= new HashMap<Short, Module>();
 		highestID 			= 0;
+
+		moduleFolderPath 	= module_folder_path;
 	}
 
 	public void compile() {
@@ -30,46 +34,58 @@ public class Manifest implements IJsonSource {
 
 		FileFilter moduleFilter = new FileFilter() {
 			public boolean accept(File file) {
-				return file.getName().endsWith(".jar");
+				return file.getName().toLowerCase().endsWith(".jar");
 			}
 		};
 
-		String relativePath = new File("data\\").getAbsolutePath().toString();
-		System.out.println("[manifest]: data folder path: " + relativePath);		
-		File[] folders = new File("data\\").listFiles(directoryFilter);
+		String relativePath = new File(moduleFolderPath).toPath().toString();
+		System.out.println("[manifest]: data folder path: " + relativePath);
 		
-		boolean folderFound = false;
-		int lastID = 0;
 		
-		for (File folder : folders) {
-			// // check to see if a last ID was recorded for this folder name.
-			// Integer folderLastID = packageToLastId.get(folder.toString());
-
-			// if (folderLastID != null) {
-			// 	lastID = folderLastID.intValue();
-			// 	folderFound = true;
-			// 	System.out.println("[manifest]: using last ID: " + lastID);
-			// } else {
-			// 	lastID = highestID;
-			// }
-
-			// lastID = searchDirectory(folder, relativePath, lastID);
-
-			// // record the new lastID for the specific folder.
-			// packageToLastId.put(folder.toString(), lastID);
-
-			// // increment the lastID up to next increment of 32767.
-			// if (folderFound == false) {
-			// 	lastID += Short.MAX_VALUE - (lastID % Short.MAX_VALUE);
-			// 	// if the current lastID is now higher than the recorded highest ID update the
-			// 	// highest value.
-			// 	if (lastID > highestID) {
-			// 		highestID = lastID;
-			// 	}
-			// }
+		File[] unpacked_modules = new File(moduleFolderPath).listFiles(directoryFilter);
+		for (File module : unpacked_modules) {
+			System.out.println(module.getName());
+			Module m = new Module(module.getPath(), true);
+			System.out.println("hash was: " + m.getHash());
 		}
+		File[] modules = new File(moduleFolderPath).listFiles(moduleFilter);
+		for (File module : modules) {
+			System.out.println(module.getName());
+			Module m = new Module(module.getPath());
+			System.out.println("hash was: " + m.getHash());
+		}
+		// boolean folderFound = false;
+		// int lastID = 0;
+		
+		// for (File folder : folders) {
+		// 	// // check to see if a last ID was recorded for this folder name.
+		// 	// Integer folderLastID = packageToLastId.get(folder.toString());
+
+		// 	// if (folderLastID != null) {
+		// 	// 	lastID = folderLastID.intValue();
+		// 	// 	folderFound = true;
+		// 	// 	System.out.println("[manifest]: using last ID: " + lastID);
+		// 	// } else {
+		// 	// 	lastID = highestID;
+		// 	// }
+
+		// 	// lastID = searchDirectory(folder, relativePath, lastID);
+
+		// 	// // record the new lastID for the specific folder.
+		// 	// packageToLastId.put(folder.toString(), lastID);
+
+		// 	// // increment the lastID up to next increment of 32767.
+		// 	// if (folderFound == false) {
+		// 	// 	lastID += Short.MAX_VALUE - (lastID % Short.MAX_VALUE);
+		// 	// 	// if the current lastID is now higher than the recorded highest ID update the
+		// 	// 	// highest value.
+		// 	// 	if (lastID > highestID) {
+		// 	// 		highestID = lastID;
+		// 	// 	}
+		// 	// }
+		// }
 		// saves the current manifest file to the disk.
-		AssetManager.writeToJson(this, "manifest.json", true);
+		AssetManager.writeToJson(this, moduleFolderPath + "manifest.json", true);
 	}
 
 	private int searchDirectory(File folder, String relativePath, int lastID) {

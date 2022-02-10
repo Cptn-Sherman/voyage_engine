@@ -26,7 +26,7 @@ public class OpenGL {
     private static int vertexCount = 0;
     private static Camera camera;
 
-    public static void init() {
+    public static void initialize() {
         GL.createCapabilities();
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glCullFace(GL11.GL_BACK);

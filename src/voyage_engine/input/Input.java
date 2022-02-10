@@ -28,7 +28,7 @@ public class Input {
 	private static Vec2 currentMouse = new Vec2();
 	private static Vec2 mouseDelta = new Vec2();
 
-	public static void init(long w) {
+	public static void initialize(long w) {
 		System.out.println("[client]: initializing input map...");
 		window = w;
 		MOUSEBUTTON_TO_GLFW.put(MouseButton.ONE, 0);

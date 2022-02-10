@@ -8,31 +8,33 @@ import java.security.NoSuchAlgorithmException;
 
 public class Module {
 
-    private String filepath, hash, version, engine_version, name, description;
-    private boolean unpacked = false;
-    private short id;
+	private String filepath, hash, version, engine_version, name, description;
+	private boolean unpacked = false;
+	private short id;
 
-	private MessageDigest messageDigest;
+	public Module(String filepath) {
+		this(filepath, false);
+	}
 
-    public Module(String filepath) {
-        
-        try {
-			messageDigest = MessageDigest.getInstance("SHA-256");
+	public Module(String filepath, boolean unpacked) {
+		this.filepath = filepath;
+		this.unpacked = unpacked;
+		hash = (unpacked) ? "UNPACKED-SKIPPING-HASH" : Module.computeHash(filepath);
+	}
+
+	public static String computeHash(String filepath) {
+		try {
+			return getFileChecksum(MessageDigest.getInstance("SHA-256"), new File(filepath));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "";
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+			return "";
 		}
-        computeHash();
-    }
+	}
 
-    public void computeHash() {
-        try {
-            hash = getFileChecksum(messageDigest, new File(filepath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static String getFileChecksum(MessageDigest digest, File file) throws IOException {
+	private static String getFileChecksum(MessageDigest digest, File file) throws IOException {
 		// Get file input stream for reading the file content
 		FileInputStream inputStream = new FileInputStream(file);
 		// Create byte array to read data in chunks
@@ -56,15 +58,15 @@ public class Module {
 		return sb.toString();
 	}
 
-    public String getHash() {
-        return hash;
-    }
+	public String getHash() {
+		return hash;
+	}
 
-    public short getId() {
-        return id;
-    }
+	public short getId() {
+		return id;
+	}
 
-    public boolean isUnpacked() {
-        return unpacked;
-    }
+	public boolean isUnpacked() {
+		return unpacked;
+	}
 }

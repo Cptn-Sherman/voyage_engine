@@ -46,7 +46,7 @@ public abstract class Asset {
 		this.isReady = ready;
 	}
 
-	public String toString() {
+	public String toAssetString() {
 		return "[id: 0x" + String.format("%08x", assetID).toUpperCase() + ", type: " + this.getClass().getSimpleName().toUpperCase() + ", references " + getReferenceCount() + ", filename: \"" + getFilename() + "\"]";
 	}
 }
