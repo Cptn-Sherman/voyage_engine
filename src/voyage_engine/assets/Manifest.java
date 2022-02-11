@@ -108,8 +108,7 @@ public class Manifest implements IJsonSource {
 				return file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
 			}
 		};
-		File[] modules = new File(moduleFolderpath).listFiles(moduleFilter);
-		return modules;
+		return new File(moduleFolderpath).listFiles(moduleFilter);
 	}
 
 	private int searchDirectory(File folder, String relativePath, int lastID) {

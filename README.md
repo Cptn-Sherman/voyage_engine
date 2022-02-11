@@ -88,17 +88,9 @@
 - [X] Asset & Content unload when refernce count is zero.
 - [ ] Manifest asset & content id collisions.
 - [ ] Hot load .class which extend Asset & Content classes.
-- [ ] Screenshots folder in "data" needs to be ignored by the manifest.
+- [ ] Screenshots should be saved in the PCs picture directory.
 #### **Bugs:**
 - [ ] `Surprise.jpg` is loaded by asset manager and the reference is higher than expected. (Was 3 expected 2). This results in asset staying loaded when it should not be.
-- [ ] manifest.json highestID contains the wrong value. Should not be lower than any values in folderToLastID.
-```json
-  "folderToLastID": {
-    "data\\screenshots": 32797, <-- A
-    "data\\base": 34
-  },
-  "highestID": 32767 <--- should be higher than A
-```
 #### **Notes:**
 - Pools of threads distribute tasks evenly.
 - Asset and content managers can load and unload when there are not instance of the asset in use.
@@ -109,12 +101,10 @@
 ---
 
 ### **MODDING & USER SHARED CONTENT:**
+- [X] Load pack and unpacked modules.
+- [ ] Load pack and unpacked remote modules.
+- [ ] Compile master manifest.
 - [ ] Instructions to pack a user jar with data folder included.
-- [ ] Load external jars.
-- [ ] Update added mod.
-- [ ] Users can attempt to force load a mod jar with missmatched versions.
-- [ ] Load new mod jars at runtime.
-- [ ] Load unpacked java project for development of mods.
 #### **Bugs:**
 #### **Notes:**
 - 
