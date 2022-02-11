@@ -1,7 +1,34 @@
 {
   "filenameToPath": {},
   "filenameToId": {},
-  "packageToLastId": {},
-  "highestID": 0,
-  "moduleFolderPath": "data\\"
+  "moduleIdToModule": {
+    "-32766": {
+      "filepath": "data\\spool.jar",
+      "hash": "18696a1bafb88eea3e9425f144a4fd3fcad21884cef5d25a59827440bbd957f8",
+      "name": "spool.jar",
+      "unpacked": false,
+      "drop_in": true,
+      "id": -32766,
+      "asset_count": 0,
+      "content_count": 0,
+      "total_bytes": 246990
+    },
+    "-32767": {
+      "filepath": "data\\cool unpacked mod",
+      "hash": "UNPACKED_cool unpacked mod",
+      "name": "cool unpacked mod",
+      "unpacked": true,
+      "drop_in": true,
+      "id": -32767,
+      "asset_count": 0,
+      "content_count": 0,
+      "total_bytes": 0
+    }
+  },
+  "moduleHashToId": {
+    "UNPACKED_cool unpacked mod": -32767,
+    "18696a1bafb88eea3e9425f144a4fd3fcad21884cef5d25a59827440bbd957f8": -32766
+  },
+  "moduleFolderpath": "data\\",
+  "next_id": -32765
 }

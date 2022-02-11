@@ -53,7 +53,7 @@ public class Window {
 	public void create() {
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit()) {
-			throw new IllegalStateException("[client]: ERROR! Unable to initialize glfw");
+			throw new IllegalStateException("[client]: ERROR: Unable to initialize glfw!");
 		}
 
 		// configure GLFW and set window hints.
@@ -112,7 +112,7 @@ public class Window {
 			// recalculate all ui elements and panels.
 			// TODO: add these back in
 //			Application.getState().resizeUI();
-			System.out.println("[client]: display resized to [" + width + "x" + height + "]");
+			System.out.println("[client]: window resized to [" + width + "x" + height + "]");
 		});
 
 		// callback for clicking inside or out of the window.
@@ -160,7 +160,7 @@ public class Window {
 		} else {
 			GLFW.glfwSetInputMode(window_address, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
 		}
-		System.out.println("[client]: display focused " + Application.isFocused());
+		System.out.println("[client]: window focus:  " + Application.isFocused());
 	}
 	
 	

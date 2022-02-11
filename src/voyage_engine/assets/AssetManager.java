@@ -18,7 +18,9 @@ import voyage_engine.assets.shader.Shader;
 import voyage_engine.assets.texture.Texture;
 
 public class AssetManager {
-	private static final String MODULE_FOLDER_PATH = "data\\";
+	public static final String MODULE_FOLDER_PATH = "data\\";
+	public static final short RESERVED_GENERATED_ASSET_ID = Short.MIN_VALUE;
+
 
 	private static Manifest manifest;
 	private static HashMap<Integer, Asset> assetMap;
@@ -40,9 +42,10 @@ public class AssetManager {
 		if (manifest == null) {
 			System.out.println("[manifest]: generating new manifest...");
 			manifest = new Manifest(MODULE_FOLDER_PATH);
+			manifest.compile();
+		} else {
+			manifest.validate();
 		}
-		// compile the manifest, checking for new assets or changes.
-		manifest.compile();
 		System.out.println("[manifest]: successfully loaded!");
 	}
 
