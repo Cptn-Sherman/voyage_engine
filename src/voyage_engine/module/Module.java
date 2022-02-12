@@ -7,20 +7,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Module {
-
 	private static final int KILOBYTE = 1024;
 	private static final int MEGABYTE = 1024 * KILOBYTE;
 	private static final int GIGABYTE = 1024 * MEGABYTE;
 
-	private String filepath, hash, version, engine_version, name, description;
-	private boolean unpacked = false;
-	private boolean drop_in = true;
+	private String name, filepath, hash, version, engine_version, description;
+	private boolean unpacked, drop_in, isRoot;
 	private short id, asset_count, content_count;
 	private long total_bytes = 0L;
-
-	public Module(String filepath) {
-		this(filepath, false);
-	}
 
 	public Module(String filepath, boolean unpacked) {
 		File file = new File(filepath);
@@ -30,6 +24,14 @@ public class Module {
 
 		this.total_bytes = new File(filepath).length();
 		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath);
+	}
+
+	public void process() {
+		if (unpacked) {
+
+		} else {
+			
+		}
 	}
 
 	public static String computeHash(String filepath) {
@@ -70,6 +72,14 @@ public class Module {
 
 	public String getHash() {
 		return hash;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public String getSupportedEngineVersion() {
+		return engine_version;
 	}
 
 	public short getId() {
