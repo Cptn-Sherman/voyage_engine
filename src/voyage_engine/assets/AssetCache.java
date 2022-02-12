@@ -4,19 +4,19 @@ import java.util.LinkedList;
 
 public class AssetCache {
 
-    public LinkedList<Integer> idList;
+    public LinkedList<String> idList;
 
     public AssetCache() {
-        idList = new LinkedList<Integer>();
+        idList = new LinkedList<String>();
     }
 
-    public void include(int id) {
+    public void include(String id) {
         idList.add(id);
     }
 
     public void freeCache() {
         System.out.println("[assets]: releasing " + idList.size() + " assets from cache.");
-        for(int id : idList) {
+        for(String id : idList) {
             AssetManager.release(id);
         }
         idList.clear();

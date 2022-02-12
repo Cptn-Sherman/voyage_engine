@@ -1,7 +1,7 @@
 package voyage_engine.assets;
 
 public abstract class Asset {
-	private int assetID;
+	private String assetID;
 	private boolean referenceCounted;
 	private int references;
 	protected boolean isReady;
@@ -24,11 +24,11 @@ public abstract class Asset {
 		references += val;
 	}
 
-	public int getAssetID() {
+	public String getAssetID() {
 		return assetID;
 	}
 
-	public void setAssetID(int id) {
+	public void setAssetID(String id) {
 		assetID = id;
 	}
 

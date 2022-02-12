@@ -10,7 +10,7 @@ import spool.IJsonSource;
 public class Manifest implements IJsonSource {
 	private static int MODULE_ID_RANGE = Math.abs(Short.MAX_VALUE) + Short.MAX_VALUE;
 	private HashMap<String, String> filenameToPath;
-	private HashMap<String, Integer> filenameToId;
+	private HashMap<String, String> filenameToId;
 
 	private HashMap<Short, Module> moduleIdToModule;
 	private HashMap<String, Short> moduleHashToId;
@@ -20,7 +20,7 @@ public class Manifest implements IJsonSource {
 
 	public Manifest(String module_folderpath) {
 		filenameToPath = new HashMap<String, String>();
-		filenameToId = new HashMap<String, Integer>();
+		filenameToId = new HashMap<String, String>();
 		moduleIdToModule = new HashMap<Short, Module>();
 		moduleHashToId = new HashMap<String, Short>();
 		moduleFolderpath = module_folderpath;
@@ -111,27 +111,27 @@ public class Manifest implements IJsonSource {
 		return new File(moduleFolderpath).listFiles(moduleFilter);
 	}
 
-	private int searchDirectory(File folder, String relativePath, int lastID) {
-		File[] files = folder.listFiles();
-		for (File f : files) {
-			if (f.isDirectory()) {
-				lastID = searchDirectory(f, relativePath, lastID);
-			} else {
-				String filename = formatFilename(f.toString());
-				if (!(filenameToPath.containsKey(filename) && filenameToId.containsKey(filename))) {
-					filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
-					filenameToId.put(filename, lastID);
-					lastID++;
-					System.out.println("\tadding:  " + filename);
-				} else {
-					System.out.println("\tfound:   " + filename);
-				}
-			}
-		}
-		return lastID;
-	}
+	// private int searchDirectory(File folder, String relativePath, String lastID) {
+	// 	File[] files = folder.listFiles();
+	// 	for (File f : files) {
+	// 		if (f.isDirectory()) {
+	// 			lastID = searchDirectory(f, relativePath, lastID);
+	// 		} else {
+	// 			String filename = formatFilename(f.toString());
+	// 			if (!(filenameToPath.containsKey(filename) && filenameToId.containsKey(filename))) {
+	// 				filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
+	// 				filenameToId.put(filename, lastID);
+	// 				lastID++;
+	// 				System.out.println("\tadding:  " + filename);
+	// 			} else {
+	// 				System.out.println("\tfound:   " + filename);
+	// 			}
+	// 		}
+	// 	}
+	// 	return lastID;
+	// }
 
-	public int getID(String filename) {
+	public String getID(String filename) {
 		return filenameToId.get(filename);
 	}
 
