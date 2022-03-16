@@ -21,8 +21,8 @@ public class Module {
 		this.name = file.getName();
 		this.filepath = filepath;
 		this.unpacked = unpacked;
-
 		this.total_bytes = new File(filepath).length();
+		// we should not try to hash unpacked modules as there contents are expected to change frequently.
 		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath);
 	}
 
