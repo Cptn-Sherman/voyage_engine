@@ -36,7 +36,7 @@ public class Module {
 
 	public static String computeHash(String filepath) {
 		try {
-			return getFileChecksum(MessageDigest.getInstance("SHA-256"), new File(filepath));
+			return getFileChecksum(MessageDigest.getInstance("SHA-1"), new File(filepath)).toUpperCase();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
@@ -105,6 +105,7 @@ public class Module {
 	public String getFormatedSizeString() {
 		float val = 0;
 		String str = "";
+		if (total_bytes == 0L) return "???";
 		if (total_bytes <= KILOBYTE) {
 			val = total_bytes;
 			val = (float) (Math.round(val * 100.0) / 100.0);
@@ -131,8 +132,8 @@ public class Module {
 
 	@Override
 	public String toString() {
-		return "[module: " + name + ", id: " + getModuleIdString() + ", hash: " + hash + ", unpacked: "
+		return "module: [name: " + name + ", id: " + getModuleIdString() +  ", unpacked: "
 		+ unpacked + ", size: "
-				+ getFormatedSizeString() + "]";
+				+ getFormatedSizeString() + ", hash: " + hash + "]";
 	}
 }

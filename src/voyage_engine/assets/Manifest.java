@@ -9,6 +9,7 @@ import spool.IJsonSource;
 
 public class Manifest implements IJsonSource {
 	private static int MODULE_ID_RANGE = Math.abs(Short.MAX_VALUE) + Short.MAX_VALUE;
+	
 	private HashMap<String, String> filenameToPath;
 	private HashMap<String, String> filenameToId;
 
@@ -33,7 +34,7 @@ public class Manifest implements IJsonSource {
 	 * existing entries.
 	 */
 	public boolean validate() {
-		System.out.println("[manifest]: validating...");
+		System.out.println("[manifest]: validating manifest...");
 		File[] modules = getModules();
 		// gaurd if the number of modules does not match the number of modules in the
 		// manifest, they cannot match.
@@ -58,10 +59,10 @@ public class Manifest implements IJsonSource {
 		Module storedModule = moduleIdToModule.get(id);
 		if (!storedModule.equals(module)) {
 			System.out.println("\tERROR -> " + module.toString());
-			System.out.println("\tERROR!!! Expected to find match, but module was not exact match to manifest record.");
+			System.out.println("\t\tERROR!!! Expected to find match, but module was not exact match to manifest record.");
 			return false;
 		} else {
-			System.out.println("\tfound -> " + storedModule.toString());
+			System.out.println("\tusing -> \t" + storedModule.toString());
 			return true;
 		}
 	}
@@ -75,7 +76,7 @@ public class Manifest implements IJsonSource {
 		module.setId(getNextId());
 		moduleHashToId.put(module.getHash(), module.getId());
 		moduleIdToModule.put(module.getId(), module);
-		System.out.println("\tinserted -> " + module.toString());
+		System.out.println("\tinserting -> \t" + module.toString());
 	}
 
 	/**
