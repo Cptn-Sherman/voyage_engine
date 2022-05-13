@@ -5,7 +5,7 @@
     "-32766": {
       "name": "spool.jar",
       "filepath": "data\\spool.jar",
-      "hash": "18696a1bafb88eea3e9425f144a4fd3fcad21884cef5d25a59827440bbd957f8",
+      "hash": "421197C006B23E95A9AEB338B11A9BD7E74E13E3",
       "unpacked": false,
       "drop_in": false,
       "isRoot": false,
@@ -28,9 +28,10 @@
     }
   },
   "moduleHashToId": {
-    "UNPACKED_cool unpacked mod": -32767,
-    "18696a1bafb88eea3e9425f144a4fd3fcad21884cef5d25a59827440bbd957f8": -32766
+    "421197C006B23E95A9AEB338B11A9BD7E74E13E3": -32766,
+    "UNPACKED_cool unpacked mod": -32767
   },
   "moduleFolderpath": "data\\",
-  "next_id": -32765
+  "next_id": -32765,
+  "algorithm_type": "SHA-1"
 }

@@ -7,6 +7,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Module {
+	public static String HASH_ALGORITHM = "SHA-1";
+	
 	private static final int KILOBYTE = 1024;
 	private static final int MEGABYTE = 1024 * KILOBYTE;
 	private static final int GIGABYTE = 1024 * MEGABYTE;
@@ -23,7 +25,7 @@ public class Module {
 		this.unpacked = unpacked;
 		this.total_bytes = new File(filepath).length();
 		// we should not try to hash unpacked modules as there contents are expected to change frequently.
-		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath);
+		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath, HASH_ALGORITHM);
 	}
 
 	public void process() {
@@ -34,9 +36,9 @@ public class Module {
 		}
 	}
 
-	public static String computeHash(String filepath) {
+	public static String computeHash(String filepath, String algorithm) {
 		try {
-			return getFileChecksum(MessageDigest.getInstance("SHA-1"), new File(filepath)).toUpperCase();
+			return getFileChecksum(MessageDigest.getInstance(algorithm), new File(filepath)).toUpperCase();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";

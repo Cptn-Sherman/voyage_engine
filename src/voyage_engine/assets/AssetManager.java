@@ -39,12 +39,10 @@ public class AssetManager {
 		}
 		// if the manifest failed to load or if rebase is set to true a new manifest
 		// must be generated.
-		if (manifest == null) {
+		if (manifest == null || !manifest.validate()) {
 			System.out.println("[manifest]: generating new manifest...");
 			manifest = new Manifest(MODULE_FOLDER_PATH);
 			manifest.compile();
-		} else {
-			manifest.validate();
 		}
 		System.out.println("[manifest]: successfully loaded!");
 	}

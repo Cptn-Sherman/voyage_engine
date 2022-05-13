@@ -8,8 +8,8 @@ import voyage_engine.module.Module;
 import spool.IJsonSource;
 
 public class Manifest implements IJsonSource {
-	private static int MODULE_ID_RANGE = Math.abs(Short.MAX_VALUE) + Short.MAX_VALUE;
-	
+	private static int MAX_MODULE_COUNT = Math.abs(Short.MAX_VALUE) + Short.MAX_VALUE;
+
 	private HashMap<String, String> filenameToPath;
 	private HashMap<String, String> filenameToId;
 
@@ -18,6 +18,7 @@ public class Manifest implements IJsonSource {
 
 	private String moduleFolderpath;
 	private short next_id;
+	private String algorithm_type;
 
 	public Manifest(String module_folderpath) {
 		filenameToPath = new HashMap<String, String>();
@@ -25,6 +26,7 @@ public class Manifest implements IJsonSource {
 		moduleIdToModule = new HashMap<Short, Module>();
 		moduleHashToId = new HashMap<String, Short>();
 		moduleFolderpath = module_folderpath;
+		algorithm_type = Module.HASH_ALGORITHM;
 		next_id = AssetManager.RESERVED_GENERATED_ASSET_ID + 1;
 	}
 
@@ -34,42 +36,53 @@ public class Manifest implements IJsonSource {
 	 * existing entries.
 	 */
 	public boolean validate() {
+		boolean discrepancy = false;
 		System.out.println("[manifest]: validating manifest...");
+		
+		if (this.algorithm_type != Module.HASH_ALGORITHM) {
+			System.out.println("[manifest]: algorithm type for module hash did not match.");
+			System.out.println("\t expected: " + Module.HASH_ALGORITHM + " found: " + this.algorithm_type);
+			return false;
+		}
 		File[] modules = getModules();
 		// gaurd if the number of modules does not match the number of modules in the
 		// manifest, they cannot match.
-		if (modules.length != moduleIdToModule.size())
+		if (modules.length != moduleIdToModule.size()) {
+			System.out.println("[manifest]: module count did not match id-to-module map.");
 			return false;
+		}
+
 		for (File module : modules) {
 			Module m = new Module(module.getPath(), !module.getPath().endsWith(".jar"));
 
-			if (!moduleStored(m)) {
+			if (!matchesStoredModule(m)) {
 				addModule(m);
-			} else {
-				if (!matchesStoredModule(m)) {
-					System.out.println("\tERROR!!!\n\tPANIC\n\tPANIC\n\tPANIC.");
-				}
+				discrepancy = true;
 			}
 		}
-		return true;
+		return (!discrepancy);
 	}
 
+	/**
+	 * Checks if the given module matches on stored in the manfiest
+	 * @param module The module to check for
+	 * @return true if the module was a match
+	 */
 	public boolean matchesStoredModule(Module module) {
 		Short id = moduleHashToId.get(module.getHash());
+		if (id == null) {
+			return false;
+		}
 		Module storedModule = moduleIdToModule.get(id);
 		if (!storedModule.equals(module)) {
 			System.out.println("\tERROR -> " + module.toString());
-			System.out.println("\t\tERROR!!! Expected to find match, but module was not exact match to manifest record.");
+			System.out
+					.println("\t\tERROR!!! Expected to find match, but module was not exact match to manifest record.");
 			return false;
 		} else {
 			System.out.println("\tusing -> \t" + storedModule.toString());
 			return true;
 		}
-	}
-
-	private boolean moduleStored(Module module) {
-		Short id = moduleHashToId.get(module.getHash());
-		return (id != null);
 	}
 
 	private void addModule(Module module) {
@@ -80,27 +93,24 @@ public class Manifest implements IJsonSource {
 	}
 
 	/**
-	 * Reads the data folder and adds modules and their contents to master manifest.
+	 * Reads the data folder and adds modules and their contents to a new master manifest.
 	 */
 	public void compile() {
 		System.out.println("[manifest]: compiling...");
-		// examine the files in the data folder
+		// get a list of all modules in data folder.
 		File[] modules = getModules();
-
-		if (modules.length >= MODULE_ID_RANGE) {
-			System.out.println("[manifest]: engine does not support " + MODULE_ID_RANGE + " id's.");
+		// ensure the number of mods to not exceed the max.
+		if (modules.length >= MAX_MODULE_COUNT) {
+			System.out.println("[manifest]: engine does not support " + modules.length + " id's.");
+			System.out.println("\tthis is a lot of mods fella...");
 			return;
 		}
-
-		for (File module : modules) {
-			addModule(new Module(module.getPath(), !module.getPath().endsWith(".jar")));
+		// for each of the modules add them to the list.
+		for (File moduleFile : modules) {
+			addModule(new Module(moduleFile.getPath(), !moduleFile.getPath().endsWith(".jar")));
 		}
 		// saves the current manifest file to the disk.
 		AssetManager.writeToJson(this, moduleFolderpath + "manifest.json", true);
-	}
-
-	private short getNextId() {
-		return next_id++;
 	}
 
 	private File[] getModules() {
@@ -112,25 +122,31 @@ public class Manifest implements IJsonSource {
 		return new File(moduleFolderpath).listFiles(moduleFilter);
 	}
 
-	// private int searchDirectory(File folder, String relativePath, String lastID) {
-	// 	File[] files = folder.listFiles();
-	// 	for (File f : files) {
-	// 		if (f.isDirectory()) {
-	// 			lastID = searchDirectory(f, relativePath, lastID);
-	// 		} else {
-	// 			String filename = formatFilename(f.toString());
-	// 			if (!(filenameToPath.containsKey(filename) && filenameToId.containsKey(filename))) {
-	// 				filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
-	// 				filenameToId.put(filename, lastID);
-	// 				lastID++;
-	// 				System.out.println("\tadding:  " + filename);
-	// 			} else {
-	// 				System.out.println("\tfound:   " + filename);
-	// 			}
-	// 		}
-	// 	}
-	// 	return lastID;
+	// private int searchDirectory(File folder, String relativePath, String lastID)
+	// {
+	// File[] files = folder.listFiles();
+	// for (File f : files) {
+	// if (f.isDirectory()) {
+	// lastID = searchDirectory(f, relativePath, lastID);
+	// } else {
+	// String filename = formatFilename(f.toString());
+	// if (!(filenameToPath.containsKey(filename) &&
+	// filenameToId.containsKey(filename))) {
+	// filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
+	// filenameToId.put(filename, lastID);
+	// lastID++;
+	// System.out.println("\tadding: " + filename);
+	// } else {
+	// System.out.println("\tfound: " + filename);
 	// }
+	// }
+	// }
+	// return lastID;
+	// }
+
+	private short getNextId() {
+		return next_id++;
+	}
 
 	public String getID(String filename) {
 		return filenameToId.get(filename);
