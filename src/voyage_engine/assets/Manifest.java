@@ -39,7 +39,7 @@ public class Manifest implements IJsonSource {
 		boolean discrepancy = false;
 		System.out.println("[manifest]: validating manifest...");
 		
-		if (this.algorithm_type != Module.HASH_ALGORITHM) {
+		if (!this.algorithm_type.equals(Module.HASH_ALGORITHM)) {
 			System.out.println("[manifest]: algorithm type for module hash did not match.");
 			System.out.println("\t expected: " + Module.HASH_ALGORITHM + " found: " + this.algorithm_type);
 			return false;
@@ -54,10 +54,10 @@ public class Manifest implements IJsonSource {
 
 		for (File module : modules) {
 			Module m = new Module(module.getPath(), !module.getPath().endsWith(".jar"));
-
 			if (!matchesStoredModule(m)) {
 				addModule(m);
 				discrepancy = true;
+				break;
 			}
 		}
 		return (!discrepancy);
