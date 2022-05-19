@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Module {
 	public static String HASH_ALGORITHM = "SHA-1";
-	
+
 	private static final int KILOBYTE = 1024;
 	private static final int MEGABYTE = 1024 * KILOBYTE;
 	private static final int GIGABYTE = 1024 * MEGABYTE;
@@ -24,16 +24,9 @@ public class Module {
 		this.filepath = filepath;
 		this.unpacked = unpacked;
 		this.total_bytes = new File(filepath).length();
-		// we should not try to hash unpacked modules as there contents are expected to change frequently.
+		// we should not try to hash unpacked modules as there contents are expected to
+		// change frequently.
 		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath, HASH_ALGORITHM);
-	}
-
-	public void process() {
-		if (unpacked) {
-
-		} else {
-			
-		}
 	}
 
 	public static String computeHash(String filepath, String algorithm) {
@@ -89,7 +82,7 @@ public class Module {
 	}
 
 	public void setId(short val) {
-		id = val;	
+		id = val;
 	}
 
 	public String getModuleIdString() {
@@ -107,7 +100,8 @@ public class Module {
 	public String getFormatedSizeString() {
 		float val = 0;
 		String str = "";
-		if (total_bytes == 0L) return "???";
+		if (total_bytes == 0L)
+			return "???";
 		if (total_bytes <= KILOBYTE) {
 			val = total_bytes;
 			val = (float) (Math.round(val * 100.0) / 100.0);
@@ -129,13 +123,14 @@ public class Module {
 	}
 
 	public boolean equals(Module other) {
-		return other.getHash().equals(this.getHash()) && other.getBtyeCount() == this.getBtyeCount() && other.isUnpacked() == this.unpacked;
+		return other.getHash().equals(this.getHash()) && other.getBtyeCount() == this.getBtyeCount()
+				&& other.isUnpacked() == this.unpacked;
 	}
 
 	@Override
 	public String toString() {
-		return "module: [name: " + name + ", id: " + getModuleIdString() +  ", unpacked: "
-		+ unpacked + ", size: "
+		return "module: [name: " + name + ", id: " + getModuleIdString() + ", unpacked: "
+				+ unpacked + ", size: "
 				+ getFormatedSizeString() + ", hash: " + hash + "]";
 	}
 }

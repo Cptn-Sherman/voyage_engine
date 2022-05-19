@@ -38,7 +38,7 @@ public class Manifest implements IJsonSource {
 	public boolean validate() {
 		boolean discrepancy = false;
 		System.out.println("[manifest]: validating manifest...");
-		
+
 		if (!this.algorithm_type.equals(Module.HASH_ALGORITHM)) {
 			System.out.println("[manifest]: algorithm type for module hash did not match.");
 			System.out.println("\t expected: " + Module.HASH_ALGORITHM + " found: " + this.algorithm_type);
@@ -65,6 +65,7 @@ public class Manifest implements IJsonSource {
 
 	/**
 	 * Checks if the given module matches on stored in the manfiest
+	 * 
 	 * @param module The module to check for
 	 * @return true if the module was a match
 	 */
@@ -93,7 +94,8 @@ public class Manifest implements IJsonSource {
 	}
 
 	/**
-	 * Reads the data folder and adds modules and their contents to a new master manifest.
+	 * Reads the data folder and adds modules and their contents to a new master
+	 * manifest.
 	 */
 	public void compile() {
 		System.out.println("[manifest]: compiling...");
@@ -105,9 +107,11 @@ public class Manifest implements IJsonSource {
 			System.out.println("\tthis is a lot of mods fella...");
 			return;
 		}
-		// for each of the modules add them to the list.
+		// for each of the modules add them to the list and process it.
 		for (File moduleFile : modules) {
-			addModule(new Module(moduleFile.getPath(), !moduleFile.getPath().endsWith(".jar")));
+			Module module = new Module(moduleFile.getPath(), !moduleFile.getPath().endsWith(".jar"));
+			processModule(module);
+			addModule(module);
 		}
 		// saves the current manifest file to the disk.
 		AssetManager.writeToJson(this, moduleFolderpath + "manifest.json", true);
@@ -122,27 +126,33 @@ public class Manifest implements IJsonSource {
 		return new File(moduleFolderpath).listFiles(moduleFilter);
 	}
 
-	// private int searchDirectory(File folder, String relativePath, String lastID)
-	// {
-	// File[] files = folder.listFiles();
-	// for (File f : files) {
-	// if (f.isDirectory()) {
-	// lastID = searchDirectory(f, relativePath, lastID);
-	// } else {
-	// String filename = formatFilename(f.toString());
-	// if (!(filenameToPath.containsKey(filename) &&
-	// filenameToId.containsKey(filename))) {
-	// filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
-	// filenameToId.put(filename, lastID);
-	// lastID++;
-	// System.out.println("\tadding: " + filename);
-	// } else {
-	// System.out.println("\tfound: " + filename);
-	// }
-	// }
-	// }
-	// return lastID;
-	// }
+	private void processModule(Module module) {
+		if (module.isUnpacked()) {
+
+		} else {
+
+		}
+	}
+
+	private int searchDirectory(File folder, String relativePath, String lastID) {
+		for (File f : folder.listFiles()) {
+			if (f.isDirectory()) {
+				lastID = searchDirectory(f, relativePath, lastID);
+			} else {
+				String filename = formatFilename(f.toString());
+				if (!(filenameToPath.containsKey(filename) &&
+						filenameToId.containsKey(filename))) {
+					filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
+					filenameToId.put(filename, lastID);
+					lastID++;
+					System.out.println("\tadding: " + filename);
+				} else {
+					System.out.println("\tfound: " + filename);
+				}
+			}
+		}
+		return lastID;
+	}
 
 	private short getNextId() {
 		return next_id++;
