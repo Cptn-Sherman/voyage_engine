@@ -11,7 +11,7 @@ public class Manifest implements IJsonSource {
 	private static int MAX_MODULE_COUNT = Math.abs(Short.MAX_VALUE) + Short.MAX_VALUE;
 
 	private HashMap<String, String> filenameToPath;
-	private HashMap<String, String> filenameToId;
+	private HashMap<String, Integer> filenameToId;
 
 	private HashMap<Short, Module> moduleIdToModule;
 	private HashMap<String, Short> moduleHashToId;
@@ -22,7 +22,7 @@ public class Manifest implements IJsonSource {
 
 	public Manifest(String module_folderpath) {
 		filenameToPath = new HashMap<String, String>();
-		filenameToId = new HashMap<String, String>();
+		filenameToId = new HashMap<String, Integer>();
 		moduleIdToModule = new HashMap<Short, Module>();
 		moduleHashToId = new HashMap<String, Short>();
 		moduleFolderpath = module_folderpath;
@@ -134,7 +134,7 @@ public class Manifest implements IJsonSource {
 		}
 	}
 
-	private int searchDirectory(File folder, String relativePath, String lastID) {
+	private int searchDirectory(File folder, String relativePath, int lastID) {
 		for (File f : folder.listFiles()) {
 			if (f.isDirectory()) {
 				lastID = searchDirectory(f, relativePath, lastID);
@@ -158,7 +158,7 @@ public class Manifest implements IJsonSource {
 		return next_id++;
 	}
 
-	public String getID(String filename) {
+	public int getID(String filename) {
 		return filenameToId.get(filename);
 	}
 

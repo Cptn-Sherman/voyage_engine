@@ -23,15 +23,15 @@ public class AssetManager {
 
 
 	private static Manifest manifest;
-	private static HashMap<String, Asset> assetMap;
+	private static HashMap<Integer, Asset> assetMap;
 
-	private static LinkedList<String> unloadIdList;
+	private static LinkedList<Integer> unloadIdList;
 
 	public static void initialize(boolean rebaseManifest) {
 		// Start spool and use the default initializer to auto detect thread count.
 		Spool.initialize();
-		assetMap = new HashMap<String, Asset>();
-		unloadIdList = new LinkedList<String>();
+		assetMap = new HashMap<Integer, Asset>();
+		unloadIdList = new LinkedList<Integer>();
 
 		System.out.println("[manifest]: loading manifest...");
 		if (!rebaseManifest) { // if we are not rebasing, just attempt to load the manifest.
@@ -68,7 +68,7 @@ public class AssetManager {
 	// using
 	// multi-threaded Loading.
 	public static Texture getTexture(AssetCache cache, String filename, boolean filter, boolean mipmap) {
-		String id = manifest.getID(filename);
+		int id = manifest.getID(filename);
 		// if a cache was provided the id will be include in the cache list to free when
 		// cache is no longer needed.
 		if (cache != null) {
@@ -91,7 +91,7 @@ public class AssetManager {
 	// returns the requested font by filename if it can be found in the content map
 	// or returns a new pointer to the font and loads the font immediately.
 	public static Font getFont(AssetCache cache, String filename, int oversampling, boolean filter) {
-		String id = manifest.getID(filename);
+		int id = manifest.getID(filename);
 		// if a cache was provided the id will be include in the cache list to free when
 		// cache is no longer needed.
 		if (cache != null) {
@@ -115,7 +115,7 @@ public class AssetManager {
 
 	// returns the requested shader file
 	public static Shader getShader(AssetCache cache, String filename) {
-		String id = manifest.getID(filename);
+		int id = manifest.getID(filename);
 		// if a cache was provided the id will be include in the cache list to free when
 		// cache is no longer needed.
 		if (cache != null) {
@@ -214,7 +214,7 @@ public class AssetManager {
 		}
 	}
 
-	public static void release(String id) {
+	public static void release(Integer id) {
 		Asset asset = assetMap.get(id);
 		release(asset);
 	}
@@ -232,7 +232,7 @@ public class AssetManager {
 
 	private static void releaseUnreferencedAssets() {
 		// delete all the id's in the unload list.
-		for (String id : unloadIdList) {
+		for (int id : unloadIdList) {
 			assetMap.remove(id);
 		}
 		unloadIdList.clear();
