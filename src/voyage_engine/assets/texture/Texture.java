@@ -58,7 +58,7 @@ public class Texture extends Asset implements IMultithreadLoad, IGPUAsset {
 	
 	@Override
     public boolean isReady() {
-        return isReady && (this.getAssetID() != null);
+        return isReady && (this.getAssetID() != 0);
     }
 
     @Override
