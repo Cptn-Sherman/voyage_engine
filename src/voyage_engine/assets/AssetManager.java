@@ -21,7 +21,6 @@ public class AssetManager {
 	public static final String MODULE_FOLDER_PATH = "data\\";
 	public static final short RESERVED_GENERATED_ASSET_ID = Short.MIN_VALUE;
 
-
 	private static Manifest manifest;
 	private static HashMap<Integer, Asset> assetMap;
 

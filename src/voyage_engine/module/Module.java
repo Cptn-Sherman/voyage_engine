@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+
+import voyage_engine.assets.Manifest;
+
 public class Module {
 	public static String HASH_ALGORITHM = "SHA-1";
 
@@ -14,19 +17,61 @@ public class Module {
 	private static final int GIGABYTE = 1024 * MEGABYTE;
 
 	private String name, filepath, hash, version, engine_version, description;
+	private short module_id;
 	private boolean unpacked, drop_in, isRoot;
-	private short id, asset_count, content_count;
+	private short id, asset_count, content_count, last_id;
 	private long total_bytes = 0L;
 
-	public Module(String filepath, boolean unpacked) {
+	public Module(String filepath, boolean unpacked, short module_id) {
 		File file = new File(filepath);
 		this.name = file.getName();
 		this.filepath = filepath;
 		this.unpacked = unpacked;
+		this.module_id = module_id;
 		this.total_bytes = new File(filepath).length();
 		// we should not try to hash unpacked modules as there contents are expected to
 		// change frequently.
 		hash = (unpacked) ? "UNPACKED_" + name : Module.computeHash(filepath, HASH_ALGORITHM);
+		last_id = 0;
+	}
+
+	public void process(Manifest manifest) {
+		//todo: process the modules manifest file for descripition and other things like that.
+		//todo: for unpacked modules we should know if we are "re-checking"
+		// if we have "any" unpacked modules we need to revalidate the folder and process every time or check if modified date does not match, which means we need to store this value as well... in this class
+		if (this.isUnpacked()) {
+			searchDirectory(manifest, filepath);
+		} else {
+
+		}
+	}
+
+	private void searchDirectory(Manifest manifest, String path) {
+		File[] files = new File(path).listFiles();
+		for (File f : files) {
+			if (f.isDirectory()) {
+				searchDirectory(manifest, f.getPath());
+			} else {
+				String filename = formatFilename(f.toString());
+				if(!(manifest.getFilenameToIdMap().containsKey(filename) && manifest.getFilenameToPathMap().containsKey(filename))) {
+					manifest.getFilenameToPathMap().put(filename, f.getAbsolutePath().replace(manifest.getModuleDataFolderLocation(), ""));
+					manifest.getFilenameToIdMap().put(filename, getAssetId());
+					System.out.println("\tadding: " + filename);
+					//todo: check whether this is an asset file or content and increase the counter.
+				} else {
+					// do nothing becuase the asset or content already exists.
+					System.out.println("\tfound: " + filename);
+				}
+			}
+		}
+	}
+
+	public int getAssetId() {
+		return (int)((int)module_id << 16) | ((int) last_id++); //! <--- needs testing
+	}
+
+	public String formatFilename(String path) {
+		return path.substring(path.lastIndexOf('\\') + 1, path.lastIndexOf('.'));
 	}
 
 	public static String computeHash(String filepath, String algorithm) {
@@ -77,8 +122,8 @@ public class Module {
 		return engine_version;
 	}
 
-	public short getId() {
-		return id;
+	public short getModuleId() {
+		return module_id;
 	}
 
 	public void setId(short val) {
@@ -95,6 +140,10 @@ public class Module {
 
 	public long getBtyeCount() {
 		return total_bytes;
+	}
+
+	public String getFilepath() {
+		return filepath;
 	}
 
 	public String getFormatedSizeString() {

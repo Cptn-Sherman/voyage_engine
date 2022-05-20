@@ -2,7 +2,11 @@ package voyage_engine.assets;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.sun.org.apache.xpath.internal.operations.Mod;
+
 import voyage_engine.module.Module;
 
 import spool.IJsonSource;
@@ -17,8 +21,10 @@ public class Manifest implements IJsonSource {
 	private HashMap<String, Short> moduleHashToId;
 
 	private String moduleFolderpath;
-	private short next_id;
 	private String algorithm_type;
+	private boolean usingUnpacked = false;
+
+	private short next_module_id;
 
 	public Manifest(String module_folderpath) {
 		filenameToPath = new HashMap<String, String>();
@@ -27,7 +33,9 @@ public class Manifest implements IJsonSource {
 		moduleHashToId = new HashMap<String, Short>();
 		moduleFolderpath = module_folderpath;
 		algorithm_type = Module.HASH_ALGORITHM;
-		next_id = AssetManager.RESERVED_GENERATED_ASSET_ID + 1;
+
+		// set the starting value to -32,768 + 1 as this value is reserved for generated content.
+		next_module_id = Short.MIN_VALUE + 1;
 	}
 
 	/**
@@ -53,12 +61,19 @@ public class Manifest implements IJsonSource {
 		}
 
 		for (File module : modules) {
-			Module m = new Module(module.getPath(), !module.getPath().endsWith(".jar"));
-			if (!matchesStoredModule(m)) {
-				addModule(m);
-				discrepancy = true;
-				break;
+			boolean unpacked = !module.getPath().endsWith(".jar");
+			if (unpacked) {
+				usingUnpacked = true;
+
+			} else {
+				Module m = new Module(module.getPath(), unpacked, (short) 0);
+				if (!matchesStoredModule(m)) {
+					addModule(m);
+					discrepancy = true;
+					break;
+				}	
 			}
+			
 		}
 		return (!discrepancy);
 	}
@@ -87,9 +102,8 @@ public class Manifest implements IJsonSource {
 	}
 
 	private void addModule(Module module) {
-		module.setId(getNextId());
-		moduleHashToId.put(module.getHash(), module.getId());
-		moduleIdToModule.put(module.getId(), module);
+		moduleHashToId.put(module.getHash(), module.getModuleId());
+		moduleIdToModule.put(module.getModuleId(), module);
 		System.out.println("\tinserting -> \t" + module.toString());
 	}
 
@@ -97,65 +111,62 @@ public class Manifest implements IJsonSource {
 	 * Reads the data folder and adds modules and their contents to a new master
 	 * manifest.
 	 */
-	public void compile() {
+	public boolean compile() {
 		System.out.println("[manifest]: compiling...");
 		// get a list of all modules in data folder.
-		File[] modules = getModules();
-		// ensure the number of mods to not exceed the max.
-		if (modules.length >= MAX_MODULE_COUNT) {
-			System.out.println("[manifest]: engine does not support " + modules.length + " id's.");
-			System.out.println("\tthis is a lot of mods fella...");
-			return;
+		ArrayList<Module> data_modules = getModules();
+
+		// ensure the number of mods to not exceed the max number of supported modules.
+		if (data_modules.size() >= MAX_MODULE_COUNT) {
+			System.out.println("[manifest]: engine does not support " + data_modules.size() + " id's.");
+			System.out.println("\tthe maximum supported mod count is current " + MAX_MODULE_COUNT);
+			System.out.println("\tno one will ever see this error... i hope :)");
+			return false;
 		}
+
+		for (Module module : moduleIdToModule.values()) {
+			// try to find a match in the data modules array
+
+			// if we find one awesome, as long as its not unpacked we can remove it from the data_modules array.
+
+			// if dont find a match at all, this means a mod that was installed has been removed.
+
+
+		}
+		// we need to process each of the mods remaining in the moduleId folder
+
 		// for each of the modules add them to the list and process it.
-		for (File moduleFile : modules) {
-			Module module = new Module(moduleFile.getPath(), !moduleFile.getPath().endsWith(".jar"));
-			processModule(module);
+		for (File moduleFile : data_modules) {
+			Module module = new Module(moduleFile.getPath(), !moduleFile.getPath().endsWith(".jar"), next_module_id);
+			module.process(this);
 			addModule(module);
+			// advance the module id by 1.
+			next_module_id++;
 		}
 		// saves the current manifest file to the disk.
 		AssetManager.writeToJson(this, moduleFolderpath + "manifest.json", true);
 	}
 
-	private File[] getModules() {
+	/**
+	 * Scans the games data folder for modules.
+	 * @return  An arrayList of modules.
+	 */
+	private ArrayList<Module> getModules() {
 		FileFilter moduleFilter = new FileFilter() {
 			public boolean accept(File file) {
 				return file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
 			}
 		};
-		return new File(moduleFolderpath).listFiles(moduleFilter);
-	}
-
-	private void processModule(Module module) {
-		if (module.isUnpacked()) {
-
-		} else {
-
+		File[] files = new File(moduleFolderpath).listFiles(moduleFilter);
+		ArrayList<Module> modules = new ArrayList<Module>(files.length);
+		for (int i = 0; 0 < files.length; i++) {
+			modules.add(new Module(files[i].getPath(), !files[i].getPath().endsWith(".jar"), getModuleId()));
 		}
+		return modules;
 	}
 
-	private int searchDirectory(File folder, String relativePath, int lastID) {
-		for (File f : folder.listFiles()) {
-			if (f.isDirectory()) {
-				lastID = searchDirectory(f, relativePath, lastID);
-			} else {
-				String filename = formatFilename(f.toString());
-				if (!(filenameToPath.containsKey(filename) &&
-						filenameToId.containsKey(filename))) {
-					filenameToPath.put(filename, f.getAbsolutePath().replace(relativePath, ""));
-					filenameToId.put(filename, lastID);
-					lastID++;
-					System.out.println("\tadding: " + filename);
-				} else {
-					System.out.println("\tfound: " + filename);
-				}
-			}
-		}
-		return lastID;
-	}
-
-	private short getNextId() {
-		return next_id++;
+	private short getModuleId() {
+		return next_module_id++;
 	}
 
 	public int getID(String filename) {
@@ -166,7 +177,19 @@ public class Manifest implements IJsonSource {
 		return filenameToPath.get(filename);
 	}
 
-	public String formatFilename(String path) {
-		return path.substring(path.lastIndexOf('\\') + 1, path.lastIndexOf('.'));
+	public String getModuleDataFolderLocation() {
+		return moduleFolderpath;
+	}
+
+	public HashMap<String, Integer> getFilenameToIdMap() {
+		return this.filenameToId;
+	}
+
+	public HashMap<String, String> getFilenameToPathMap() {
+		return this.filenameToPath;
+	}
+
+	public static String toAssetString(int assetID) {
+		return "[0x" + String.format("%08x", assetID).toUpperCase() + "]";
 	}
 }
